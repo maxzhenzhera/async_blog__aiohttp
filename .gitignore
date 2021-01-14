@@ -1,0 +1,23 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Environments
+.venv
+venv/
+
+# Static file
+img/
+
+# Utils
+utils/
+
+# Logs
+logs/
+*.log
+
+# PyCharm files
+.idea/
+
+# Config data
+config/config.ini
