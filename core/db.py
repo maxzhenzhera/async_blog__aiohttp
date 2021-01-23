@@ -1,4 +1,31 @@
-""" Db tables """
+"""
+Main: classes that implement database objects.
+All classes: have attrs (vars with sql code values) - create and drop process.
+Class `Database`: also have attrs for the user that have access to lead the database work.
+Classes like  `TableName`:  also have methods that implement `crud` operations.
+"""
+
+
+__all__ = ['Database', 'tables']
+# tables in the end of file
+
+
+class Database:
+    """ Implement app database """
+    # DB
+    create_database = (
+        "DROP DATABASE IF EXISTS {db_name};                                     "
+        "CREATE DATABASE IF NOT EXISTS {db_name} DEFAULT CHARACTER SET utf8;    "
+    )
+    drop_database = "DROP SCHEMA IF EXISTS {db_name}"
+
+    # DB user
+    create_user = (
+        "DROP USER IF EXISTS {user_name};                                              "
+        "CREATE USER IF NOT EXISTS {user_name} IDENTIFIED BY '{user_password}';             "
+        "GRANT ALL PRIVILEGES ON {db_name}.* TO {user_name} WITH GRANT OPTION;   "
+    )
+    drop_user = "DROP USER IF EXISTS {user_name};"
 
 
 class TableUsers:
@@ -100,3 +127,9 @@ class TableNotes:
     drop_table = (
         "DROP TABLE IF EXISTS `notes`;"
     )
+
+
+# ------------------------- It`s compulsory to keep order like: -------------------------
+# TableParent, TableChild ...
+# This order counts in `init_db.py` when tables create or drop.
+tables: tuple = (TableUsers, TablePostRubrics, TablePosts, TableNoteRubrics, TableNotes,)
