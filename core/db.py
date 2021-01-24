@@ -67,7 +67,7 @@ class TablePosts:
         "CREATE TABLE IF NOT EXISTS `posts` (                                                       "
         "    `id` INT NOT NULL AUTO_INCREMENT,                                                      "
         "    `title` VARCHAR(255) NOT NULL,                                                         "
-        "    `content` BLOB NOT NULL,                                                               "
+        "    `content` TEXT NOT NULL,                                                               "
         "    `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,                            "
         "    `edited_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
         "    `user_id` INT NULL,                                                                    "

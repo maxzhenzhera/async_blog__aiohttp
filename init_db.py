@@ -35,6 +35,7 @@ async def setup_db(connection: aiomysql.Connection) -> None:
 
     async with connection.cursor() as cursor:
         await cursor.execute(query_create_database)
+        logger.success('Database is created.')
 
     await create_tables(connection)
     await create_user(connection)
@@ -48,6 +49,7 @@ async def teardown_db(connection: aiomysql.Connection) -> None:
 
     async with connection.cursor() as cursor:
         await cursor.execute(query_drop_database)
+        logger.success('Database is dropped.')
 
     await drop_user(connection)
 
@@ -60,6 +62,7 @@ async def create_tables(connection: aiomysql.Connection) -> None:
         await cursor.execute(query_use_database)
         for table in tables:
             await cursor.execute(table.create_table)
+        logger.success('Tables are created.')
 
 
 async def drop_tables(connection: aiomysql.Connection) -> None:
@@ -70,6 +73,7 @@ async def drop_tables(connection: aiomysql.Connection) -> None:
         await cursor.execute(query_use_database)
         for table in tables:
             await cursor.execute(table.drop_table)
+        logger.success('Tables are dropped.')
 
 
 async def create_user(connection: aiomysql.Connection) -> None:
@@ -82,6 +86,7 @@ async def create_user(connection: aiomysql.Connection) -> None:
 
     async with connection.cursor() as cursor:
         await cursor.execute(query_create_user)
+        logger.success('User is created.')
 
 
 async def drop_user(connection: aiomysql.Connection) -> None:
@@ -92,6 +97,7 @@ async def drop_user(connection: aiomysql.Connection) -> None:
 
     async with connection.cursor() as cursor:
         await cursor.execute(query_drop_user)
+        logger.success('User is dropped.')
 
 
 async def main(loop: asyncio.AbstractEventLoop) -> None:
@@ -105,13 +111,14 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
         autocommit=True
     )
 
-    await teardown_db(connection)
-
-    # await setup_db(connection)
+    # await teardown_db(connection)
+    await setup_db(connection)
 
     # --------------------------------------------------
-    # # await drop_tables(cursor)
-    # # await teardown_db(cursor)
+    # # await drop_tables(connection)
+    # # await create_tables(connection)
+    # # await drop_user(connection)
+    # # await create_user(connection)
     # --------------------------------------------------
 
     connection.close()
