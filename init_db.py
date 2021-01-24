@@ -1,6 +1,23 @@
 """
-Initialize (create db, tables, new role) and implement deleting all this stuff.
-As we don`t use ORM like SQLAlchemy, most of the needed SQL code is saved in a particular directory.
+Setups or drops database (database, user, tables).
+
+Functions:
+    async def setup_db | (connection: aiomysql.Connection) -> None | setup the full database with tables and user,
+    database ready to work
+    --------------------------------------------------------------------------------------------------------------------
+    async def teardown_db | (connection: aiomysql.Connection) -> None | drop the full database with tables and user,
+    database entirely deleted
+    --------------------------------------------------------------------------------------------------------------------
+    async def create_tables | (connection: aiomysql.Connection) -> None | create all tables for the database
+    --------------------------------------------------------------------------------------------------------------------
+    async def drop_tables | (connection: aiomysql.Connection) -> None | drop all tables from the database
+    --------------------------------------------------------------------------------------------------------------------
+    async def create_user | (connection: aiomysql.Connection) -> None | create the database user
+    --------------------------------------------------------------------------------------------------------------------
+    async def drop_user | (connection: aiomysql.Connection) -> None | drop the database user
+    --------------------------------------------------------------------------------------------------------------------
+    async def main | (loop: asyncio.AbstractEventLoop) -> None | use all the above functions
+    --------------------------------------------------------------------------------------------------------------------
 """
 
 import asyncio
@@ -28,7 +45,7 @@ DB_ROOT_PASSWORD: str = DATABASE_CONFIG['root_password']
 
 
 async def setup_db(connection: aiomysql.Connection) -> None:
-    """ Creates database, tables and user """
+    """ Create database, tables and user """
     query_create_database = Database.create_database.format(
         db_name=DB_NAME
     )
@@ -42,7 +59,7 @@ async def setup_db(connection: aiomysql.Connection) -> None:
 
 
 async def teardown_db(connection: aiomysql.Connection) -> None:
-    """ Drops the entire base """
+    """ Drop the entire base """
     query_drop_database = Database.drop_database.format(
         db_name=DB_NAME
     )
@@ -55,7 +72,7 @@ async def teardown_db(connection: aiomysql.Connection) -> None:
 
 
 async def create_tables(connection: aiomysql.Connection) -> None:
-    """ Creates all tables in the database """
+    """ Create all tables in the database """
     query_use_database = "USE {db_name}".format(db_name=DB_NAME)
 
     async with connection.cursor() as cursor:
@@ -66,7 +83,7 @@ async def create_tables(connection: aiomysql.Connection) -> None:
 
 
 async def drop_tables(connection: aiomysql.Connection) -> None:
-    """ Drops all tables in the database """
+    """ Drop all tables in the database """
     query_use_database = "USE {db_name}".format(db_name=DB_NAME)
 
     async with connection.cursor() as cursor:
@@ -77,7 +94,7 @@ async def drop_tables(connection: aiomysql.Connection) -> None:
 
 
 async def create_user(connection: aiomysql.Connection) -> None:
-    """ Creates user that lead the app database """
+    """ Create user that lead the app database """
     query_create_user = Database.create_user.format(
         db_name=DB_NAME,
         user_name=DB_USER_NAME,
@@ -90,7 +107,7 @@ async def create_user(connection: aiomysql.Connection) -> None:
 
 
 async def drop_user(connection: aiomysql.Connection) -> None:
-    """ Drops user that lead the app database """
+    """ Drop user that lead the app database """
     query_drop_user = Database.drop_user.format(
         user_name=DB_USER_NAME,
     )
@@ -101,7 +118,7 @@ async def drop_user(connection: aiomysql.Connection) -> None:
 
 
 async def main(loop: asyncio.AbstractEventLoop) -> None:
-    """ All functions described above can be used here """
+    """ Invoke functions that operate with database """
     connection = await aiomysql.connect(
         host=DB_HOST,
         port=DB_PORT,
