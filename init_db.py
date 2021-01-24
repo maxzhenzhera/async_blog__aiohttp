@@ -97,6 +97,7 @@ async def create_user(connection: aiomysql.Connection) -> None:
     """ Create user that lead the app database """
     query_create_user = Database.create_user.format(
         db_name=DB_NAME,
+        host=DB_HOST,
         user_name=DB_USER_NAME,
         user_password=DB_USER_PASSWORD
     )
@@ -128,7 +129,7 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
         autocommit=True
     )
 
-    # await teardown_db(connection)
+    await teardown_db(connection)
     await setup_db(connection)
 
     # --------------------------------------------------

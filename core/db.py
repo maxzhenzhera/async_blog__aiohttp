@@ -35,7 +35,7 @@ import aiomysql
 from loguru import logger
 
 
-__all__ = ['Database', 'tables']
+__all__ = ['Database', 'tables', 'init_mysql', 'close_mysql']
 # `tables` in the end of classes
 
 
@@ -51,9 +51,9 @@ class Database:
 
     # DB user
     create_user = (
-        "DROP USER IF EXISTS {user_name};                                       "
-        "CREATE USER IF NOT EXISTS {user_name} IDENTIFIED BY '{user_password}'; "
-        "GRANT ALL PRIVILEGES ON {db_name}.* TO {user_name} WITH GRANT OPTION;  "
+        "DROP USER IF EXISTS {user_name}@'{host}';                                       "
+        "CREATE USER IF NOT EXISTS {user_name}@'{host}' IDENTIFIED BY '{user_password}'; "
+        "GRANT ALL PRIVILEGES ON {db_name}.* TO {user_name}@'{host}';                    "
     )
     drop_user = "DROP USER IF EXISTS {user_name};"
 
@@ -171,12 +171,16 @@ tables: tuple = (TableUsers, TablePostRubrics, TablePosts, TableNoteRubrics, Tab
 # ------------------------- ||||||||||||||||||||||||||||||||||| -------------------------
 
 
-async def init_mysql(app: aiohttp.web.Application, loop: asyncio.AbstractEventLoop) -> None:
+async def init_mysql(app: aiohttp.web.Application) -> None:
     """ Create and set in app settings MySQL pool """
     db_config = app['config']['mysql']
+    loop: asyncio.AbstractEventLoop = app['loop']
+
+    port: int = int(db_config['port'])
+
     pool = await aiomysql.create_pool(
         host=db_config['host'],
-        port=int(db_config['port']),
+        port=port,
         user=db_config['user_name'],
         password=db_config['user_password'],
         db=db_config['database'],
