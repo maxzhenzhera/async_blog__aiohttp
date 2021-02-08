@@ -23,7 +23,7 @@ from loguru import logger
 
 
 class InvalidParameterTypeError(Exception):
-    """ Raises when URL parameter has the incorrect data type """
+    """ Raised when URL parameter has the incorrect data type """
 
 
 class UrlParam:

@@ -1,5 +1,5 @@
 """
-Contains functions that implement the hash processing.
+Contains functions that implement the hash and encrypt processing.
 
 Functions:
     --------------------------------------------------------------------------------------------------------------------
@@ -7,8 +7,9 @@ Functions:
     --------------------------------------------------------------------------------------------------------------------
 """
 
-
+import base64
 import bcrypt
+import cryptography.fernet
 
 
 def hash_password(password: str) -> str:
@@ -23,7 +24,7 @@ def hash_password(password: str) -> str:
 
 
 def compare_password_with_hash(password: str, hashed_password: str) -> bool:
-    """ Check the password on compliance with the hash"""
+    """ Check the password on compliance with the hash """
     password = password.encode()
     hashed_password = hashed_password.encode()
 
@@ -35,7 +36,14 @@ def compare_password_with_hash(password: str, hashed_password: str) -> bool:
         return True
 
 
-if __name__ == '__main__':
-    password = 'super_secret_key'
-    hashed_password = hash_password(password)
-    compare_password_with_hash(password, hashed_password)
+def generate_secret_key() -> bytes:
+    """ Generate secret key for session-cookie storage """
+    fernet_key = cryptography.fernet.Fernet.generate_key()
+    secret_key = base64.urlsafe_b64decode(fernet_key)
+    return secret_key
+
+
+# if __name__ == '__main__':
+#     password = 'super_secret_key'
+#     hashed_password = hash_password(password)
+#     compare_password_with_hash(password, hashed_password)

@@ -15,6 +15,9 @@ Classes:
     -------------------------
     class TableNotes        |
     --------------------------------------------------------------------------------------------------------------------
+Vars:
+    tables: tuple | contains all database tables in order (ParentTable, ChildTable)
+    --------------------------------------------------------------------------------------------------------------------
 """
 
 __all__ = ['Database', 'tables']
@@ -46,7 +49,8 @@ class TableUsers:
             `id` INT NOT NULL AUTO_INCREMENT,
             `login` VARCHAR(255) NOT NULL,
             `password` VARCHAR(255) NOT NULL,
-            `is_admin` TINYINT NOT NULL,
+            `is_admin` TINYINT(1) NOT NULL DEFAULT '0',
+            `is_moderator` TINYINT(1) NOT NULL DEFAULT '0',
             PRIMARY KEY (`id`)
         )  ENGINE=INNODB;
     """
