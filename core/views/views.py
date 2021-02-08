@@ -242,10 +242,16 @@ class NoteRubricEditing(aiohttp.web.View):
 
 class UserRegistration(aiohttp.web.View):
     """ View class for '/user/register/ url. Implement GET and POST requests. """
-    # @aiohttp_jinja2.template('post_creation_form.html')
+    @aiohttp_jinja2.template('sign_in.html')
+    @views_decorators.put_session_data_in_view_result
+    @views_decorators.put_router_in_view_result
     async def get(self) -> dict:
         """ View for '/user/register/' url {GET} """
+
         return {}
+
+    # Handlers should be coroutines accepting self only and returning response object as regular web-handler.
+    # Request object can be retrieved by View.request property.
 
     async def post(self):
         """ View for '/user/register/' url {POST} """

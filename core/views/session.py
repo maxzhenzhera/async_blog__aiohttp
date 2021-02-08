@@ -33,6 +33,8 @@ from typing import (
 import aiohttp.web
 import aiohttp_session
 
+from core.views import views_decorators
+
 
 def login_required(handler: Callable = None, *args, grant: str = 'user', **kwargs) -> Callable:
     """
@@ -62,6 +64,7 @@ def login_required(handler: Callable = None, *args, grant: str = 'user', **kwarg
         return lambda func: login_required(handler=func, grant=grant)
 
     @wraps(handler)
+    @views_decorators.put_request_in_decorator_inner_function
     async def inner(request: aiohttp.web.Request, *args, **kwargs) -> dict:
         """ Get user data from session and check requirements (grants) """
         session = await aiohttp_session.get_session(request)
