@@ -1,22 +1,25 @@
 """
 Heart of project. Run the point of the app is here (also '__main__' available).
 
+
 Functions:
-    async def init_app| () -> aiohttp.web.Application | setup settings for app
+    async def init_app() -> aiohttp.web.Application:
+    = setup settings for app
     --------------------------------------------------------------------------------------------------------------------
-    def main | () -> None | run app
+    def main() -> None:
+    = run app
     --------------------------------------------------------------------------------------------------------------------
 """
 
 import asyncio
 
 import aiohttp
-from aiohttp import web
+import aiohttp.web
 import aiohttp_jinja2
 import jinja2
 from loguru import logger
 
-from core.db import init_mysql, close_mysql
+from core.database.mysql import init_mysql, close_mysql
 from core.middlewares import setup_middlewares
 from core.routes import setup_routes
 from core.settings import get_config
@@ -63,7 +66,7 @@ def main() -> None:
     app = init_app()
 
     config = get_config()
-    web.run_app(
+    aiohttp.web.run_app(
         app,
         host=config["server"]['host'],
         port=int(config["server"]['port'])

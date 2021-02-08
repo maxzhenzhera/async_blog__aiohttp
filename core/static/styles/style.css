@@ -1,0 +1,182 @@
+body {
+	background-color: #3f3f3f;
+	/* Bootstrap fixed footer */
+	padding-bottom: 100px;
+}
+
+
+/* 
+	index.html
+*/
+
+h1 {
+	font-family: Cambria;
+	background-color: #3f3f3f;
+	color: white;
+	text-align: center;
+	padding-bottom: 10px;
+	padding-top: 10px;
+	border-bottom: 3px white solid;
+}
+
+.welcome-head {
+	text-shadow: 0 0 2px white;
+	box-shadow: 0 20px rgba(255,255,255,.7);
+}
+
+.welcome-body {
+	font-family: Cambria;
+	background-color: rgba(0,0,0,.2);
+	width: 50%;
+	text-align: center;
+	margin: 100px auto;
+	padding: 50px;
+	font-size: 25px;
+	color: white;
+	box-shadow: 0 0 5px rgba(255,255,255,.9), 0 0 10px rgba(255,255,255,.9), 0 0 15px rgba(255,255,255,.9), 0 0 50px rgba(0,0,0,.7) inset;
+	border-radius: 15px;
+	transition: .5s;
+}
+
+.welcome-body a {
+	color: white;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.welcome-body:hover {
+	background-color: rgba(20,20,20);
+	box-shadow: 0 0 50px rgba(0,0,0,.5);
+	transform: translate(0px, 30px);
+	border-radius: 100px;
+}
+
+/*
+	contacts.html
+*/
+
+.contacts-body {
+	font-family: Cambria;
+	width: 50%;
+	margin: 100px auto;
+	padding: 50px;
+	font-size: 25px;
+}
+
+/*
+	post_rubrics.html
+*/
+
+.post-rubrics-body {
+	font-family: Cambria;
+	width: 50%;
+	margin: 100px auto;
+	padding: 50px;
+	font-size: 25px;
+	text-align: center;
+}
+
+.post-rubrics-body a {
+	text-decoration: none;
+	color: white;
+	text-shadow: 0 0 10px white;
+}
+
+/*
+	posts.html
+*/
+
+.posts-aside {
+	width: 20%;
+	float: left;
+	margin-right: 50px;
+	clear: left;
+}
+.different {}
+
+.posts-info {
+	margin: 20px 100px;
+	padding-top: 20px;
+	z-index: 1000;
+	border-top: none;
+	border-bottom: none;
+	background-color: rgba(255,255,255,.4);
+}
+
+.posts-info .container a {
+	color: black;
+	text-decoration: none;
+	text-shadow: 0 0 5px white;
+}
+
+.posts-info .container a:hover {
+	color: black;
+	text-decoration: none;
+	text-shadow: 0 0 20px black;
+}
+
+.posts a {
+	text-decoration: none;
+	color: white;
+	text-shadow: 0 0 20px white;
+}
+
+.posts a:hover {
+	text-decoration: none;
+	text-shadow: 0 0 20px black;
+}
+
+.pagination-block {
+	width: 30%;
+	margin-top: 50px;
+	margin-left: 40%;
+}
+.posts-quantity {
+	width: 30%;
+	margin-left: 25%;
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+.delete-keyword-button {
+	width: 30%;
+	margin-top: 10px;
+	margin-left: 25%;
+}
+
+/*
+	sign_in.html/sign_up.html
+*/
+
+.form {
+	width: 60%;
+	padding: 3% 10%;
+	margin-top: 50px;
+
+	color: white;
+
+	border: 3px white solid;
+	border-radius: 30px;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+
+	background-color: rgba(0,0,0,.5);
+}
+
+.form h2 {
+	text-shadow: 0 0 10px white;
+}
+
+/*
+	post.html
+*/
+
+.post {
+	border-top: 2px black solid;
+	padding-top: 50px;
+	background-color: black;
+	color: white;
+	border-bottom-left-radius: 100px;
+}

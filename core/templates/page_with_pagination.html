@@ -1,0 +1,44 @@
+{% extends "basis.html" %}
+
+{% block content %}
+	{% block inner_content %}
+	{% endblock %}
+	<div class="posts-quantity">
+		<div class="dropdown mx-auto">
+			<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+			Articles quantity
+			</button>
+			<ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+				<li><a class="dropdown-item active" onclick="addUrlParameter('quantity', 10)">10</a></li>
+				<li><a class="dropdown-item" onclick="addUrlParameter('quantity', 25)">25</a></li>
+				<li><a class="dropdown-item" onclick="addUrlParameter('quantity', 50)">50</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="delete-keyword-button">
+		<button type="button" class="btn btn-outline-danger" onclick="deleteUrlParameter('keyword')">Delete keyword from search criteria</button>
+	</div>
+
+	<div class="delete-keyword-button">
+		<button type="button" class="btn btn-outline-danger" onclick="deleteUrlParameter('rubric')">Delete rubric from search criteria</button>
+	</div>
+
+	<div class="pagination-block">
+		<nav aria-label="..." class="mx-auto">
+		<ul class="pagination">
+			<li class="page-item disabled">
+				<a class="page-link" tabindex="-1" aria-disabled="true">Pages</a>
+			</li>
+			{% for key, value in pagination.items() %}
+				{% if value is number %}
+					<li class="page-item"><a class="page-link pointer" onclick="addUrlParameter('page', {{ value }})">{{ value }}</a></li>
+				{% elif value is string %}
+					<li class="page-item"><a class="page-link">{{ value }}</a></li>
+				{% endif %}
+			{% endfor %}
+
+		</ul>
+		</nav>
+	</div>
+{% endblock %}

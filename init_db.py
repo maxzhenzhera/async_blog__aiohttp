@@ -25,7 +25,7 @@ import asyncio
 import aiomysql
 from loguru import logger
 
-from core.models import Database, tables
+from core.database.models import Database, tables
 from core.settings import BASE_DIR, get_config
 
 

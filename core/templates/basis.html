@@ -10,9 +10,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 
 	<!-- self css -->
-	<link rel="stylesheet" type="text/css" href="static/styles/style.css">
-
-	<!-- Add `active` class in nav links -->
+	<link rel="stylesheet" type="text/css" href="/static/styles/style.css">
 
 	<title>{% block title %}My Think{% endblock %}</title>
 </head>
@@ -28,50 +26,51 @@
 
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 					<!-- Add new features for logged user -->
-					{% if session.user %}
+					{% if user in session %}
 						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
 						<!-- admin can create new rubric -->
 						{% if session.user.is_admin == 1 %}
+							<li class="nav-item"><a class="nav-link" href="{{ router['admin'].url_for() }}">Admin</a></li>
 							<li class="nav-item dropdown">
 								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Rubrics</a>
 								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-									<li><a class="dropdown-item" href="rubrics/">View rubrics</a></li>
-									<li><a class="dropdown-item" href="create_rubric/">Create new rubric</a></li>
+									<li><a class="dropdown-item" href="{{ router['posts-rubrics'].url_for() }}">View rubrics</a></li>
+									<li><a class="dropdown-item" href="{{ router['posts-rubrics-create'].url_for() }}">Create new rubric</a></li>
 								</ul>
 							</li>
 						{% else %}
 							<li class="nav-item">
-									<a class="nav-link" aria-current="page" href="posts/">Rubrics</a>
+									<a class="nav-link" aria-current="page" href="{{ router['posts-rubrics'].url_for() }}">Rubrics</a>
 								</li>
 						{% endif %}
 
 							<li class="nav-item dropdown">
 								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Posts</a>
 								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-									<li><a class="dropdown-item" href="posts/">View posts</a></li>
-									<li><a class="dropdown-item" href="my_posts/">View <b>My</b> posts</a></li>
-									<li><a class="dropdown-item" href="create_post/">Create new post</a></li>
+									<li><a class="dropdown-item" href="{{ router['posts'].url_for() }}">View posts</a></li>
+									<li><a class="dropdown-item" href="{{ router['my-posts'].url_for() }}">View <b>My</b> posts</a></li>
+									<li><a class="dropdown-item" href="{{ router['posts-create'].url_for() }}">Create new post</a></li>
 								</ul>
 							</li>
 
 							<li class="nav-item dropdown">
 								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Notes</a>
 								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-									<li><a class="dropdown-item" href="posts/">View notes</a></li>
-									<li><a class="dropdown-item" href="my_posts/">Create new note rubric</a></li>
-									<li><a class="dropdown-item" href="create_post/">Create new note</a></li>
+									<li><a class="dropdown-item" href="{{ router['notes'].url_for() }}">View notes</a></li>
+									<li><a class="dropdown-item" href="{{ router['notes-rubrics-create'].url_for() }}">Create new note rubric</a></li>
+									<li><a class="dropdown-item" href="{{ router['notes-create'].url_for() }}">Create new note</a></li>
 								</ul>
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link" href="#">Contacts</a>
+								<a class="nav-link" href="{{ router['contacts'].url_for() }}">Contacts</a>
 							</li>
 
 						</ul>
 						
-						<form class="d-flex me-5 pe-5">
-							<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+						<form class="d-flex me-5 pe-5" method="GET" action="{{ router['posts'].url_for() }}">
+							<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="keyword">
 							<button class="btn btn-outline-success" type="submit">Search</button>
 						</form>
 
@@ -79,38 +78,38 @@
 							<li class="nav-item dropdown">
 								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profile</a>
 								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-									<li><a class="dropdown-item" href="settings/">Settings</a></li>
+									<li><a class="dropdown-item" href="{{ router['user-settings'].url_for() }}">Settings</a></li>
 									<li><hr class="dropdown-divider"></li>
-									<li><a class="dropdown-item" href="logout/">Logout</a></li>
+									<li><a class="dropdown-item" href="{{ router['user-logout'].url_for() }}">Logout</a></li>
 								</ul>
 							</li>
 						</ul>
 					{% else %}
 							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 								<li class="nav-item">
-									<a class="nav-link" id="rubrics" aria-current="page" href="posts/">Rubrics</a>
+									<a class="nav-link" id="rubrics" aria-current="page" href="{{ router['posts-rubrics'].url_for() }}">Rubrics</a>
 								</li>
 
 								<li class="nav-item">
-									<a class="nav-link" id="posts" aria-current="page" href="posts/">Posts</a>
+									<a class="nav-link" id="posts" aria-current="page" href="{{ router['posts'].url_for() }}">Posts</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link" id="contacts" href="#">Contacts</a>
+									<a class="nav-link" id="contacts" href="{{ router['contacts'].url_for() }}">Contacts</a>
 								</li>
 							</ul>
 							
-							<form class="d-flex me-5 pe-5">
-								<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+							<form class="d-flex me-5 pe-5" method="GET" action="{{ router['posts'].url_for() }}">
+								<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="keyword">
 								<button class="btn btn-outline-success" type="submit">Search</button>
 							</form>
 
 							<ul class="navbar-nav mx-right me-5 pe-5">
 								<li class="nav-item">
-									<a class="nav-link" aria-current="page" href="sign_in/"><b>Sign In</b></a>
+									<a class="nav-link" aria-current="page" href="{{ router['user-login'].url_for() }}"><b>Sign In</b></a>
 								</li>
 
 								<li class="nav-item">
-									<a class="nav-link" aria-current="page" href="sign_up/"><b>Sign Up</b></a>
+									<a class="nav-link" aria-current="page" href="{{ router['user-register'].url_for() }}"><b>Sign Up</b></a>
 								</li>
 							</ul>
 					{% endif %}
@@ -124,36 +123,7 @@
 		{% endblock %}
 	</main>
 
-	<footer class="bg-dark text-light fixed-bottom text-center text-lg-start">
-		<!-- Grid container -->
-		<div class="container p-4">
-			<!--Grid row-->
-			<div class="row">
-				<!--Grid column-->
-				<div class="col-lg-6 col-md-12 mb-4 mb-md-0">
-					<h5>Power of Think</h5>
-
-					<p>
-						It`s great and simle blog. You can add interesting posts on different rubrics and topics. Just share your experience with other people.
-					</p>
-				</div>
-				<!--Grid column-->
-
-				<!--Grid column-->
-				<div class="col-lg-6 col-md-12 mb-4 mb-md-0">
-					<h5>Become a part of MyThink</h5>
-
-					<p>
-						Also you can create notes that will serve like remainder. Just create account and start to explore your <i>Think</i> and <i>Thinks</i> of your colleagues.
-					</p>
-				</div>
-				<!--Grid column-->
-			</div>
-			<!--Grid row-->
-		</div>
-		<!-- Grid container -->
-
-		<!-- Copyright -->
+	<footer class="bg-dark text-light text-center text-lg-start fixed-bottom" id="footer">
 		<div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
 			© 2021 Copyright:
 			<a class="text-light" href="/">MyThink.com</a>
@@ -162,24 +132,9 @@
 	</footer>
 
 	<!-- Add `active` class to current link -->
-<!-- 	<script>
-		if ( window.location.href == 'http://localhost:5000/rubrics/' ) {
-			var el = document.getElementById("rubrics");
-			var newClass = el.getAttribute("class");
-			newClass += " active"; 
-			el.setAttribute("class", newClass);
-		} else if ( window.location.href == 'http://localhost:5000/posts/' ) {
-			var el = document.getElementById("posts");
-			var newClass = el.getAttribute("class");
-			newClass += " active"; 
-			el.setAttribute("class", newClass);
-		} else if ( window.location.href == 'http://localhost:5000/contacts/' ) {
-			var el = document.getElementById("contacts");
-			var newClass = el.getAttribute("class");
-			newClass += " active"; 
-			el.setAttribute("class", newClass);
-		}
-	</script> -->
+	<script type="text/javascript" src="/static/js/active_links.js"></script>
+	<!-- Append new url params in the end of url -->
+	<script type="text/javascript" src="/static/js/handle_url_params.js"></script>
 
 </body>
 </html>
