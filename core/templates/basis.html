@@ -26,12 +26,12 @@
 
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 					<!-- Add new features for logged user -->
-					{% if user in session %}
+					{% if 'user' in session %}
 						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
 						<!-- admin can create new rubric -->
 						{% if session.user.is_admin == 1 %}
-							<li class="nav-item"><a class="nav-link" href="{{ router['admin'].url_for() }}">Admin</a></li>
+							
 							<li class="nav-item dropdown">
 								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Rubrics</a>
 								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -49,7 +49,7 @@
 								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Posts</a>
 								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 									<li><a class="dropdown-item" href="{{ router['posts'].url_for() }}">View posts</a></li>
-									<li><a class="dropdown-item" href="{{ router['my-posts'].url_for() }}">View <b>My</b> posts</a></li>
+									<li><a class="dropdown-item" href="{{ router['user-posts'].url_for() }}">View <b>My</b> posts</a></li>
 									<li><a class="dropdown-item" href="{{ router['posts-create'].url_for() }}">Create new post</a></li>
 								</ul>
 							</li>

@@ -1,5 +1,5 @@
 {% extends "basis.html" %}
-{% block title %}MyThink{% endblock %}
+{% block title %}Registering{% endblock %}
 
 {% block content %}
 <!-- `Welcome` text -->
@@ -9,10 +9,17 @@
 
 <div class="mx-auto form">
 	<h2 class="text-center">SIGN UP</h2>
+
+	{% if message %}
+		<div class="alert alert-danger" role="alert">
+			{{ message }}
+		</div>
+	{% endif %}
+
 	<form method="POST" action="/user/register/">
 		<div class="mb-3">
-			<label for="exampleInputEmail1" class="form-label">Username</label>
-			<input class="form-control" name="username" minlength="5" required>
+			<label for="exampleInputEmail1" class="form-label">Login</label>
+			<input class="form-control" name="login" minlength="5" required>
 		</div>
 		<div class="mb-3">
 			<label for="exampleInputPassword1" class="form-label">Password</label>

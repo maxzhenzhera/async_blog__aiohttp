@@ -8,19 +8,38 @@
 </div>
 
 <div class="post-rubrics-body">
-	<table class="table table-dark table-hover">
-		<thead>
-			<tr>
-				<th scope="col">Title</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for rubric in rubrics %}
+	{% if 'user' in session and session.user.is_admin %}
+		<table class="table table-dark table-hover">
+			<thead>
 				<tr>
-					<td><a class="pointer" href="{{ router['posts'].url_for() }}?rubric={{ rubric.id }}">{{ rubric.title }}</a></td>
+					<th scope="col">Title</th>
+					<th scope="col">Actions</th>
 				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{% for rubric in rubrics %}
+					<tr>
+						<td><a class="pointer" href="{{ router['posts'].url_for() }}?rubric={{ rubric.id }}">{{ rubric.title }}</a></td>
+						<td><button type="button" class="btn btn-primary" onclick="location.href='{{ router['posts-rubrics-id-edit'].url_for(id=rubric.id|string)}}';">Edit</button></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% else %}
+		<table class="table table-dark table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Title</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for rubric in rubrics %}
+					<tr>
+						<td><a class="pointer" href="{{ router['posts'].url_for() }}?rubric={{ rubric.id }}">{{ rubric.title }}</a></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
 </div>
 {% endblock %}

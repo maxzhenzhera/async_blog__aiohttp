@@ -1,5 +1,5 @@
 {% extends "basis.html" %}
-{% block title %}Post{% endblock %}
+{% block title %}PostCreation{% endblock %}
 
 {% block content %}
 <div class="welcome-head">
@@ -28,11 +28,19 @@
 		<p class="text-center fs-3">Title:</p>
 		<p class="text-center fs-3">{{ post.title }}</p>
 
+		<hr>
+
 		<p class="text-center fs-4">Rubric:</p>
 		<p class="text-center fs-4"><a href="{{ router['posts'].url_for() }}/rubric={{ post.post_rubric_id }}">{{ post.rubric }}</a></p>
 		
-		<p class="text-center fs-6">Content:</p>
-		<p class="text-center fs-6">{{ post.content }}</p>
+		<hr>
+
+		<div class="post-inner">
+			<p class="text-center fs-6">Content:</p>
+			<p class="fs-6">{{ post.content }}</p>
+		</div>
+		
+		<hr>
 
 		<p class="text-center fs-5">Created date:</p>
 		<p class="text-center fs-5">{{ post.created_date }}</p>

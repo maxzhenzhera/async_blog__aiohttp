@@ -178,5 +178,98 @@ h1 {
 	padding-top: 50px;
 	background-color: black;
 	color: white;
-	border-bottom-left-radius: 100px;
+}
+
+.post-inner {
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.sign {
+	width: 50%;
+	margin: 50px auto;
+	background-color: rgba(0,0,0,.5);
+	color: white;
+	padding: 25px;
+	border: 3px white solid;
+	border-radius: 20px;
+}
+
+.sign div, .sign button {
+	margin-top: 30px;
+}
+
+.notes {
+	margin: 100px;
+	margin-top: 30px;
+	box-shadow: 0 0 30px white;
+	border-radius: 20px;
+	transition: .5s;
+}
+
+.notes:hover {
+	box-shadow: 0 0 50px black;
+}
+
+.notes table tbody tr {
+	padding-top: 20px;
+	transition: .5s;
+}
+
+.notes table tbody tr>td {
+	padding: 20px;
+}
+
+
+.notes table tbody tr:hover {
+	transform: translate(-5px, -5px);
+}
+
+.notes table tbody tr button {
+	transition: .7s;
+}
+
+.notes table tbody tr:hover button {
+	transform: rotate(360deg);
+}
+
+.notes-info {
+	padding: 30px;
+	padding-bottom: 10px;
+	margin-top: 50px;
+	background-color: rgba(0,0,0,.4);
+	border-radius: 100px;
+	transition: .5s;
+}
+
+.notes-info:hover {
+	background-color: rgba(0,0,0,.6);
+	border-bottom-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.notes-info div {
+	transition: .5s;
+}
+
+.notes-info:hover div {
+	transform: scale(.97);
+}
+
+.notes-info a {
+	color: white;
+	text-decoration: none;
+}
+
+.notes-info a:hover {
+	text-shadow: 0 0 20px white;
+}
+
+.note-rubrics-body {
+	font-family: Cambria;
+	width: 50%;
+	margin: 50px auto;
+	font-size: 25px;
+	text-align: center;
 }

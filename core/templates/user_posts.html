@@ -1,5 +1,5 @@
 {% extends "page_with_pagination.html" %}
-{% block title %}Posts{% endblock %}
+{% block title %}MyPosts{% endblock %}
 
 {% block inner_content %}
 <div class="welcome-head">
@@ -30,14 +30,17 @@
 					<th scope="col">Title</th>
 					<th scope="col">Created</th>
 					<th scope="col">Rubric</th>
+					<th scope="col">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for post in posts %}
 					<tr>
+
 						<td class="text-center fs-5"><a href="{{ router['posts-id'].url_for(id=post.id|string) }}" class="font-monospace a">{{ post.title }}</a></td>
 						<td class="text-center fs-5">{{ post.created_date }}</td>
 						<td class="text-center fs-5"><a class="font-monospace pointer" onclick="addUrlParameter('rubric', {{ post.post_rubric_id }})">{{ post.rubric }}</a></td>
+						<td><button type="button" class="btn btn-primary" onclick="location.href='{{ router['posts-id-edit'].url_for(id=post.id|string) }}';">Edit</button></td>
 					</tr>
 				{% endfor %}
 			</tbody>
