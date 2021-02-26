@@ -1,23 +1,22 @@
 """
 Contains classes that implement the database objects. `Database` and `TableName` contain only sql queries.
 
+.. class:: Database
+    Contains queries that create/drop database, database`s user
 
-Classes:
-    class Database | Contains queries that create/drop database, database`s user
-    --------------------------------------------------------------------------------------------------------------------
-    class TableUsers        | classes like `TableName` implement one entity type:
-    ------------------------- each class contains queries that create/drop table.
-    class TablePostRubrics  |
-    -------------------------
-    class TablePosts        |
-    -------------------------
-    class TableNoteRubrics  |
-    -------------------------
-    class TableNotes        |
-    --------------------------------------------------------------------------------------------------------------------
-Vars:
-    tables: tuple | contains all database tables in order (ParentTable, ChildTable)
-    --------------------------------------------------------------------------------------------------------------------
+.. class:: TableUsers
+    Contains sql queries that implement this entity (create/drop)
+.. class:: TablePostRubrics
+    Contains sql queries that implement this entity (create/drop)
+.. class:: TablePosts
+    Contains sql queries that implement this entity (create/drop)
+.. class:: TableNoteRubrics
+    Contains sql queries that implement this entity (create/drop)
+.. class:: TableNotes
+    Contains sql queries that implement this entity (create/drop)
+
+.. const:: tables
+    Contains all database tables in order (ParentTable, ChildTable)
 """
 
 __all__ = ['Database', 'tables']
@@ -85,13 +84,13 @@ class TablePosts:
             `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             `edited_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `user_id` INT NULL,
-            `post_rubric_id` INT NULL,
+            `rubric_id` INT NULL,
             PRIMARY KEY (`id`),
             FULLTEXT ( `title` , `content` ),
             FOREIGN KEY (`user_id`)
                 REFERENCES `users` (`id`)
                 ON DELETE SET NULL ON UPDATE NO ACTION,
-            FOREIGN KEY (`post_rubric_id`)
+            FOREIGN KEY (`rubric_id`)
                 REFERENCES `post_rubrics` (`id`)
                 ON DELETE SET NULL ON UPDATE NO ACTION
         )  ENGINE=INNODB;
@@ -125,10 +124,10 @@ class TableNotes:
             `content` VARCHAR(255) NOT NULL,
             `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             `edited_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            `note_rubric_id` INT NULL,
+            `rubric_id` INT NULL,
             `user_id` INT NOT NULL,
             PRIMARY KEY (`id`),
-            FOREIGN KEY (`note_rubric_id`)
+            FOREIGN KEY (`rubric_id`)
                 REFERENCES `note_rubrics` (`id`)
                 ON DELETE CASCADE ON UPDATE NO ACTION,
             FOREIGN KEY (`user_id`)
