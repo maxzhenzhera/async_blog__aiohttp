@@ -1,23 +1,20 @@
 """
-Setups or drops database (database, user, tables).
+Setups, drops database (database, user, tables).
 
-Functions:
-    async def setup_db | (connection: aiomysql.Connection) -> None | setup the full database with tables and user,
-    database ready to work
-    --------------------------------------------------------------------------------------------------------------------
-    async def teardown_db | (connection: aiomysql.Connection) -> None | drop the full database with tables and user,
-    database entirely deleted
-    --------------------------------------------------------------------------------------------------------------------
-    async def create_tables | (connection: aiomysql.Connection) -> None | create all tables for the database
-    --------------------------------------------------------------------------------------------------------------------
-    async def drop_tables | (connection: aiomysql.Connection) -> None | drop all tables from the database
-    --------------------------------------------------------------------------------------------------------------------
-    async def create_user | (connection: aiomysql.Connection) -> None | create the database user
-    --------------------------------------------------------------------------------------------------------------------
-    async def drop_user | (connection: aiomysql.Connection) -> None | drop the database user
-    --------------------------------------------------------------------------------------------------------------------
-    async def main | (loop: asyncio.AbstractEventLoop) -> None | use all the above functions
-    --------------------------------------------------------------------------------------------------------------------
+.. function:: setup_db(connection: aiomysql.Connection) -> None
+    setup the full database with tables and user, database ready to work
+.. function:: teardown_db(connection: aiomysql.Connection) -> None
+    drop the full database with tables and user, database entirely deleted
+.. function:: create_tables(connection: aiomysql.Connection) -> None
+    create all tables for the database
+.. function:: drop_tables(connection: aiomysql.Connection) -> None
+    drop all tables from the database
+.. function:: create_user(connection: aiomysql.Connection) -> None
+    create the database user
+.. function::f drop_user(connection: aiomysql.Connection) -> None
+    drop the database user
+.. function:: main() -> None
+    use all the above functions
 """
 
 import asyncio
@@ -104,7 +101,7 @@ async def create_user(connection: aiomysql.Connection) -> None:
 
     async with connection.cursor() as cursor:
         await cursor.execute(query_create_user)
-        logger.success('User is created.')
+        logger.success('UserCreation is created.')
 
 
 async def drop_user(connection: aiomysql.Connection) -> None:
@@ -115,17 +112,16 @@ async def drop_user(connection: aiomysql.Connection) -> None:
 
     async with connection.cursor() as cursor:
         await cursor.execute(query_drop_user)
-        logger.success('User is dropped.')
+        logger.success('UserCreation is dropped.')
 
 
-async def main(loop: asyncio.AbstractEventLoop) -> None:
+async def main() -> None:
     """ Invoke functions that operate with database """
     connection = await aiomysql.connect(
         host=DB_HOST,
         port=DB_PORT,
         user=DB_ROOT_NAME,
         password=DB_ROOT_PASSWORD,
-        loop=loop,
         autocommit=True
     )
 
@@ -143,5 +139,4 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
 
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(loop))
+    asyncio.run(main())
