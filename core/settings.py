@@ -1,20 +1,18 @@
 """
-Contain project path, config path and function that return config in `dict` format.
+Contains settings data (paths, config).
 
+.. function:: get_config() -> configparser.ConfigParser
+    Parse .ini file with settings in ConfigParser object that imitate `dict` work
 
-Functions:
-    def get_config | () -> configparser.ConfigParser | Parse .ini file with settings in ConfigParser object that
-    imitate `dict` work
-    --------------------------------------------------------------------------------------------------------------------
-Vars:
-    BASE_DIR: pathlib.Path | contains path to project directory
-    --------------------------------------------------------------------------------------------------------------------
-    DEFAULT_CONFIG_PATH: pathlib.Path | contains path to config
-    --------------------------------------------------------------------------------------------------------------------
-    DEFAULT_POSTS_ON_PAGE: int, DEFAULT_NOTES_ON_PAGE: int | simple constants
-    --------------------------------------------------------------------------------------------------------------------
+.. const:: BASE_DIR: pathlib.Path
+    Contains path to project directory
+.. const:: DEFAULT_CONFIG_PATH: pathlib.Path
+    Contains path to config
+.. const:: DEFAULT_POSTS_ON_PAGE
+    Default value of the posts quantity on page
+.. const:: DEFAULT_NOTES_ON_PAGE
+    Default value of the notes quantity on page
 """
-
 
 import configparser
 import pathlib
@@ -29,7 +27,14 @@ DEFAULT_NOTES_ON_PAGE = 20
 
 
 def get_config() -> configparser.ConfigParser:
-    """ Get config from config file """
+    """
+    Get config from config file.
+
+    :return: config object with interface like dict
+    :rtype: configparser.ConfigParser
+    """
+
     config = configparser.ConfigParser()
     config.read(DEFAULT_CONFIG_PATH)
+
     return config
