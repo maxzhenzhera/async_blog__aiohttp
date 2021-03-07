@@ -6,6 +6,8 @@ Contains classes that implement the database objects. `Database` and `TableName`
 
 .. class:: TableUsers
     Contains sql queries that implement this entity (create/drop)
+.. class:: ViewModerators
+    Contains sql queries that implement this entity (create/drop)
 .. class:: TablePostRubrics
     Contains sql queries that implement this entity (create/drop)
 .. class:: TablePosts
@@ -29,7 +31,8 @@ class Database:
         DROP DATABASE IF EXISTS {db_name};
         CREATE DATABASE IF NOT EXISTS {db_name} DEFAULT CHARACTER SET utf8;
     """
-    drop_database = "DROP SCHEMA IF EXISTS {db_name}"
+    drop_database = "DROP SCHEMA IF EXISTS {db_name};"
+    use_database = "USE {db_name};"
 
     # DB user
     create_user = """
@@ -48,12 +51,25 @@ class TableUsers:
             `id` INT NOT NULL AUTO_INCREMENT,
             `login` VARCHAR(255) NOT NULL,
             `password` VARCHAR(255) NOT NULL,
+            `about_me` TEXT DEFAULT NULL,
+            `image_path` VARCHAR(255) DEFAULT NULL,
             `is_admin` TINYINT(1) NOT NULL DEFAULT '0',
             `is_moderator` TINYINT(1) NOT NULL DEFAULT '0',
             PRIMARY KEY (`id`)
         )  ENGINE=INNODB;
     """
     drop_table = "DROP TABLE IF EXISTS `users`;"
+
+
+class ViewModerators:
+    """ Implement `moderators` table (by view) """
+    create_table = """
+    DROP VIEW IF EXISTS `moderators`;
+    CREATE VIEW `moderators` AS 
+        SELECT * FROM `users` WHERE `is_moderator` = TRUE;
+    """
+
+    drop_table = "DROP VIEW IF EXISTS `moderators`;"
 
 
 class TablePostRubrics:
@@ -121,12 +137,13 @@ class TableNotes:
         DROP TABLE IF EXISTS `notes`;
         CREATE TABLE IF NOT EXISTS `notes` (
             `id` INT NOT NULL AUTO_INCREMENT,
-            `content` VARCHAR(255) NOT NULL,
+            `content` TEXT NOT NULL,
             `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             `edited_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `rubric_id` INT NULL,
             `user_id` INT NOT NULL,
             PRIMARY KEY (`id`),
+            FULLTEXT ( `content` ),
             FOREIGN KEY (`rubric_id`)
                 REFERENCES `note_rubrics` (`id`)
                 ON DELETE CASCADE ON UPDATE NO ACTION,
@@ -141,5 +158,11 @@ class TableNotes:
 # ------------------------- It`s compulsory to keep order like: -------------------------
 # TableParent, TableChild ...
 # This order counts in `init_db.py` when tables create or drop.
-tables: tuple = (TableUsers, TablePostRubrics, TablePosts, TableNoteRubrics, TableNotes,)
+tables: tuple = (
+    TableUsers, ViewModerators,
+    TablePostRubrics,
+    TablePosts,
+    TableNoteRubrics,
+    TableNotes,
+)
 # ------------------------- ||||||||||||||||||||||||||||||||||| -------------------------
