@@ -1,0 +1,45 @@
+{% extends "basis/basis.html" %}
+
+{% block title %}Think Creation{% endblock %}
+
+{% block content %}
+	<h1>Create new <i>Think</i>!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">POST CREATION</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/posts/create/">
+
+			<div class="mb-3">
+				<label for="title" class="form-label">Title</label>
+				<input class="form-control" name="title" required minlength="5">
+			</div>
+			<div class="mb-3">
+				<label for="content" class="form-label">Content</label>
+				<br>
+				<textarea class="form-control" name="content" required minlength="5"></textarea>
+			</div>
+
+			<div class="mb-3">
+				<label for="content" class="form-label">Rubric</label>
+				<select class="form-select" name="rubric_id">
+					<option selected>None</option>
+					{% for rubric in rubrics %}
+						<option value="{{ rubric.id }}">{{ rubric.title }}</option>
+					{% endfor %}
+				</select>
+			</div>
+
+			<br>
+
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+
+{% endblock %}

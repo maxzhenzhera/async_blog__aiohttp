@@ -1,0 +1,75 @@
+<!-- this template inherits from base template -->
+{% extends "basis/basis.html" %}
+
+<!-- main section in `basis.html` -->
+{% block content %}
+	
+	<!-- block for child inner content -->
+	{% block inner_content %}
+		<!-- Entities data -->
+	{% endblock %}
+	<!-- end child info block -->
+
+	<!-- Conditions of searching data -->
+
+	<div class="additional-conditions-block">
+
+		<!-- Quantity section and pagination -->
+		<div class="additional-conditions-group">
+
+			<!-- pagination bar -->
+			<div class="additional-condition">
+				<nav aria-label="..." class="mx-auto">
+					<ul class="pagination">
+						<li class="page-item disabled">
+							<a class="page-link" tabindex="-1" aria-disabled="true">Pages</a>
+						</li>
+						{% for key, value in pagination.items() %}
+							{% if value is number %}
+								<li class="page-item"><a class="page-link pointer" onclick="addUrlParameter('page', {{ value }})">{{ value }}</a></li>
+							{% elif value is string %}
+								<li class="page-item"><a class="page-link">{{ value }}</a></li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				</nav>
+			</div>
+
+			<!-- List with possible entities quantity -->
+			<div class="additional-condition">
+				<div class="dropdown mx-auto">
+					<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">Articles quantity</button>
+					<ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+						<li><a class="dropdown-item active" onclick="addUrlParameter('quantity', 10)">10</a></li>
+						<li><a class="dropdown-item" onclick="addUrlParameter('quantity', 25)">25</a></li>
+						<li><a class="dropdown-item" onclick="addUrlParameter('quantity', 50)">50</a></li>
+						<li><a class="dropdown-item" onclick="addUrlParameter('quantity', 50)">100</a></li>
+					</ul>
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Criterias sections -->
+		<div class="additional-conditions-group">
+
+			<!-- Delete searck keyword button -->
+			<div class="additional-condition">
+				<button type="button" class="btn btn-outline-danger" onclick="deleteUrlParameter('keyword')">Delete keyword from search criteria</button>
+			</div>
+
+			<!-- Delete selected ruric button -->
+			<div class="additional-condition">
+				<button type="button" class="btn btn-outline-danger" onclick="deleteUrlParameter('rubric')">Delete rubric from search criteria</button>
+			</div>
+
+			<!-- Delete selected thinker button -->
+			<div class="additional-condition">
+				<button type="button" class="btn btn-outline-danger" onclick="deleteUrlParameter('thinker')">Delete thinker from search criteria [posts only]</button>
+			</div>
+
+		</div>
+
+	</div>
+
+{% endblock %}

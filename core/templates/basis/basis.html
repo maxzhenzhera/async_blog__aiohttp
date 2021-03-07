@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Bootstrap CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+	<!-- Bootstrap JS -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+	<!-- self css -->
+	<link rel="stylesheet" type="text/css" href="{{ static('styles/style.css') }}">
+
+	<!-- favicon -->
+	<link rel="icon" type="image/png" href="{{ static('images/favicon/favicon.ico') }}">
+
+	<!-- future title will be here -->
+	<title>{% block title %}My Think{% endblock %}</title>
+</head>
+<body>
+	<header>
+		<!--  Navigation bar  -->
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="/"><b>MyThink</b></a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+					<!-- Add new features for authorized users -->
+					{% if 'user' in session %}
+						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+						<!-- moderator features [admin also has moderator features] -->
+						{% if session.user.is_moderator or session.user.is_admin %}
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Moderator</a>
+								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+									<li><a class="dropdown-item" href="{{ url('moderator-posts-delete') }}">Delete <i>Bad</i> Think</a></li>
+								</ul>
+							</li>
+						{% endif %}
+						<!-- moderator features are ended-->
+
+						<!-- admin features -->
+						{% if session.user.is_admin %}
+							<!-- admin has access to moderator leading -->
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
+								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+									<li><a class="dropdown-item" href="{{ url('admin-set-moderator') }}">Set moderator</a></li>
+									<li><a class="dropdown-item" href="{{ url('admin-unset-moderator') }}">Unset moderator</a></li>
+								</ul>
+							</li>
+
+							<!-- admin has access to post rubrics creating -->
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Rubrics</a>
+								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+									<li><a class="dropdown-item" href="{{ url('posts-rubrics') }}">View rubrics</a></li>
+									<li><hr class="dropdown-divider"></li>
+									<li><a class="dropdown-item" href="{{ url('posts-rubrics-create') }}">Create new rubric</a></li>
+								</ul>
+							</li>
+
+						<!-- another users have access only to view post rubrics -->
+						{% else %}
+							<li class="nav-item">
+								<a class="nav-link" aria-current="page" href="{{ url('posts-rubrics') }}">Rubrics</a>
+							</li>
+
+						{% endif %}
+						<!-- admin features are ended-->
+
+						<!-- simple user features -->
+
+							<!-- common panel for all authorized users -->
+							<!-- posts section -->
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Posts</a>
+								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+									<li><a class="dropdown-item" href="{{ url('posts') }}">View posts</a></li>
+									<li><a class="dropdown-item" href="{{ url('user-posts') }}">View <b>My</b> posts</a></li>
+									<li><hr class="dropdown-divider"></li>
+									<li><a class="dropdown-item" href="{{ url('posts-create') }}">Create new post</a></li>
+								</ul>
+							</li>
+
+							<!-- notes [note rubrics] section -->
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Notes</a>
+								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+									<li><a class="dropdown-item" href="{{ url('notes') }}">View notes</a></li>
+									<li><a class="dropdown-item" href="{{ url('notes-rubrics') }}">View note rubrics</a></li>
+									<li><hr class="dropdown-divider"></li>
+									<li><a class="dropdown-item" href="{{ url('notes-create') }}">Create new note</a></li>
+									<li><a class="dropdown-item" href="{{ url('notes-rubrics-create') }}">Create new note rubric</a></li>
+								</ul>
+							</li>
+
+							<!-- contacts section -->
+							<li class="nav-item">
+								<a class="nav-link" href="{{ url('contacts') }}">Contacts</a>
+							</li>
+
+						</ul>
+						
+						<!-- Search section - form for global post searching -->
+						<form class="d-flex me-5 pe-5" method="GET" action="{{ url('posts') }}">
+							<input class="form-control me-2" type="search" placeholder="Post title" aria-label="Search" name="keyword">
+							<button class="btn btn-outline-success" type="submit" id="wide-search-button">Search post by title</button>
+						</form>
+
+						<!-- personal user data section -->
+						<ul class="navbar-nav mx-right me-5 pe-5">
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profile</a>
+								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+									<li><a class="dropdown-item" href="{{ url('thinker-id', id=session.user.id) }}">My <b>Thinker</b> page</a></li>
+									<li><a class="dropdown-item" href="{{ url('user-settings-edit') }}">Edit settings</a></li>
+									<li><hr class="dropdown-divider"></li>
+									<li><a class="dropdown-item" href="{{ url('user-logout') }}">Logout</a></li>
+								</ul>
+							</li>
+						</ul>
+
+					<!-- simple user features are ended-->
+
+					<!-- visitor (not authorized) user features -->
+					{% else %}
+							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+								<!-- post rubrics section -->
+								<li class="nav-item">
+									<a class="nav-link" id="rubrics" aria-current="page" href="{{ url('posts-rubrics') }}">Rubrics</a>
+								</li>
+
+								<!-- posts section -->
+								<li class="nav-item">
+									<a class="nav-link" id="posts" aria-current="page" href="{{ url('posts') }}">Posts</a>
+
+								<!-- contacts section -->
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" id="contacts" href="{{ url('contacts') }}">Contacts</a>
+								</li>
+							</ul>
+							
+							<!-- Search section - form for global post searching -->
+							<form class="d-flex me-5 pe-5" method="GET" action="{{ url('posts') }}">
+								<input class="form-control me-2" type="search" placeholder="Post title" aria-label="Search" name="keyword">
+								<button class="btn btn-outline-success" type="submit" id="wide-search-button">Search post by title</button>
+							</form>
+
+							<!-- authorization (registration) section -->
+							<ul class="navbar-nav mx-right me-5 pe-5">
+								<li class="nav-item">
+									<a class="nav-link" aria-current="page" href="{{ url('user-login') }}"><b>Sign In</b></a>
+								</li>
+
+								<li class="nav-item">
+									<a class="nav-link" aria-current="page" href="{{ url('user-register') }}"><b>Sign Up</b></a>
+								</li>
+							</ul>
+
+					{% endif %}
+					<!-- navbar is ended -->
+
+				</div>
+			</div>
+		</nav>
+	</header>
+	
+	<!-- all future information will be here -->
+	<main>
+		{% block content %}
+		{% endblock %}
+	</main>
+
+	<!-- footer -->
+	<footer class="bg-dark text-light text-center text-lg-start fixed-bottom" id="footer">
+		<!-- Copyright -->
+		<div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
+			© 2021 Copyright:
+			<a class="text-light" href="/">MyThink.com</a>
+		</div>
+	</footer>
+
+	<!-- JS scripts -->
+
+	<!-- Add `active` class to current link -->
+	<script type="text/javascript" src="{{ static('js/active_links.js') }}"></script>
+	<!-- Append new url params in the end of url -->
+	<script type="text/javascript" src="{{ static('js/handle_url_params.js') }}"></script>
+
+</body>
+</html>

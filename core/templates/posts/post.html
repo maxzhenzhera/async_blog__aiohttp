@@ -1,0 +1,59 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Think{% endblock %}
+
+{% block content %}
+
+<!-- Main header -->
+	<h1>Think</h1>
+
+	<!-- Help links -->
+	<div class="info">
+		<div class="info-link">
+			<p><a href="{{ url('posts-create') }}">Create a new Think</a></p>
+		</div>
+
+		<div class="info-link">
+			<p><a href="{{ url('posts-random') }}">Random post</a></p>
+		</div>
+
+		<div class="info-link">
+			<p><a href="{{ url('posts-rubrics') }}">Rubrics</a></p>
+		</div>
+
+		<!-- Search section - form for global post searching -->
+		<div class="info-link">
+			<form class="d-flex me-5 pe-5" method="GET" action="{{ url('posts') }}">
+				<input class="form-control me-2" type="search" placeholder="Post title" aria-label="Search" name="keyword">
+				<button class="btn btn-outline-success" type="submit" id="wide-search-button">Search post by title</button>
+			</form>
+		</div>
+
+	</div>
+
+
+
+	<div class="post-data">
+
+		<h2 class="text-center">{{ post.title }}</h2>
+
+		<hr>
+
+		<p class="fs-5">{{ post.content }}</p>
+
+		<hr>
+
+		{% if post.rubric %}
+			<p class="text-center fs-4">Rubric: <a href="{{ url('posts', query_={'rubric': post.rubric_id} ) }}">{{ post.rubric }}</a></p>
+		{% else %}
+			<p class="text-center fs-4">Rubric: None</p>
+		{% endif %}
+
+		<p class="text-center fs-5">Created date: {{ post.created_date }}</p>
+		<p class="text-center fs-5">Edited date: {{ post.edited_date }}</p>
+
+		<p class="text-center h5"><a href="{{ url('thinker-id', id=post.user_id) }}">{{ post.author }}</a></p>
+		<p class="text-center h5"><a href="{{ url('posts', query_={'thinker': post.user_id}) }}">See another posts of this author</a></p>
+	</div>
+{% endblock %}

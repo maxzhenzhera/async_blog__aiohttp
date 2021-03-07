@@ -1,0 +1,48 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Note{% endblock %}
+
+{% block content %}
+
+<!-- Main header -->
+	<h1>Note</h1>
+
+	<!-- Help links -->
+	<div class="info">
+
+		<div class="info-link">
+			<p class="text-center fs-3"><a href="{{ url('notes') }}">Notes</a></p>
+		</div>
+
+		<div class="info-link">
+			<p class="text-center fs-3"><a href="{{ url('notes-create') }}" class="font-monospace">Create a new Note</a></p>
+		</div>
+
+		<div class="info-link">
+			<p class="text-center fs-3"><a href="{{ url('notes-rubrics') }}">Note Rubrics</a></p>
+		</div>
+
+	</div>
+
+
+
+	<div class="post-data">
+		<p class="fs-3">{{ note.content }}</p>
+
+		<hr>
+
+		{% if note.rubric %}
+			<p class="text-center fs-4">Rubric: <a href="{{ url('notes', query_={'rubric': note.rubric_id} ) }}">{{ note.rubric }}</a></p>
+		{% else %}
+			<p class="text-center fs-4">Rubric: This note has not rubric. [You can create note rubric and edit this note]</p>
+		{% endif %}
+
+		<p class="text-center fs-5">Created date: {{ note.created_date }}</p>
+		<p class="text-center fs-5">Edited date: {{ note.edited_date }}</p>
+		<p class="text-center">
+			<button type="button" class="btn btn-primary" onclick="location.href='{{ url('notes-id-edit', id=note.id) }}';">Edit</button>
+		</p>
+
+	</div>
+{% endblock %}

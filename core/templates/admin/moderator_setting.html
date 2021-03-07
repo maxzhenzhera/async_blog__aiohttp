@@ -1,0 +1,33 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Moderator Setting{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Set <i>Moderator</i>!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">MODERATOR SETTING</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/admin/set/moderator/">
+
+			<div class="mb-3">
+				<label for="title" class="form-label">USER ID</label>
+				<input class="form-control" name="id" required minlength="1">
+			</div>
+
+			<button type="submit" class="btn btn-warning">Set Moderator</button>
+
+		</form>
+
+	</div>
+
+{% endblock %}

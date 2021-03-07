@@ -1,0 +1,20 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}MyThink{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Welcome on <i>MyThink</i>!</h1>
+
+	<div class="welcome-body">
+		<p>
+			Of course, if you are in `<b>It</b>`, you think a lot. It`s hard work that needs so much time to learn and explore new technologies.
+		</p>
+		<p class="text-center">
+			<a href="{{ url('user-register') }}">Join us</a>: let`s think together!
+		</p>
+	</div>
+	
+{% endblock %}

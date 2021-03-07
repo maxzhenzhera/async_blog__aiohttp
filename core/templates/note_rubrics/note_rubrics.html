@@ -1,0 +1,46 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Note Rubrics{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Rubrics of <i>MyThink</i> posts</h1>
+
+	<div class="info">
+
+		<div class="info-link">
+			<p class="text-center fs-3"><a href="{{ url('notes-rubrics-create') }}">Create a new Note Rubric</a></p>
+		</div>
+		
+		<div class="info-link">
+			<p class="text-center fs-3"><a href="{{ url('notes') }}">Notes</a></p>
+		</div>
+
+		<div class="info-link">
+			<p class="text-center fs-3"><a href="{{ url('notes-create') }}" class="font-monospace">Create a new Note</a></p>
+		</div>
+
+	</div>
+
+	<div class="note-rubrics">
+		<table class="table table-dark table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Title</th>
+					<th scope="col">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for rubric in rubrics %}
+					<tr>
+						<td style="width: 80%"><a class="pointer" href="{{ url('notes', query_={'rubric': rubric.id}) }}">{{ rubric.title }}</a></td>
+						<td><button type="button" class="btn btn-primary" onclick="location.href='{{ url('notes-rubrics-id-edit', id=rubric.id) }}';">Edit</button></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Note Editing{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Edit <i>Note</i>!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">NOTE EDITING</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/notes/edit/">
+
+			<input type="hidden" name="id" value="{{ note.id }}">
+
+			<div class="mb-3">
+				<label for="content" class="form-label">Content</label>
+				<br>
+				<textarea class="form-control" name="content" minlength=3 required>{{ note.content }}</textarea>
+			</div>
+
+			<div class="mb-3">
+				<label for="content" class="form-label">Rubric</label>
+				<select class="form-select" name="rubric_id">
+					{% if rubrics %}
+
+						<option selected>None</option>
+						{% for rubric in rubrics %}
+							{% if rubric.id == note.rubric_id %}
+								<option value="{{ rubric.id }}" selected>{{ rubric.title }}</option>
+							{% else %}
+								<option value="{{ rubric.id }}">{{ rubric.title }}</option>
+							{% endif %}
+						{% endfor %}
+
+					{% else %}
+						<option selected>None</option>
+					{% endif %}
+				</select>
+			</div>
+
+			<br>
+
+			<button type="submit" class="btn btn-primary">Edit</button>
+
+		</form>
+
+		<br>
+		<hr>
+
+		<form method="POST" action="/notes/delete/">
+
+			<input type="hidden" name="id" value="{{ note.id }}">
+
+			<button type="submit" class="btn btn-danger">Delete</button>
+		</form>
+
+	</div>
+
+{% endblock %}

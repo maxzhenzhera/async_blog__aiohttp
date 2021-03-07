@@ -1,0 +1,41 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Contacts{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+<!-- main header -->
+<h1>Check our <i>MyThink</i> community in other resources!</h1>
+
+<div class="contacts">
+	<table class="table table-dark table-hover">
+		<thead>
+			<tr>
+				<th scope="col">#</th>
+				<th scope="col">Source</th>
+				<th scope="col">Link</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th scope="row">1</th>
+				<td>email</td>
+				<td><a href="mailto:MyThink@gmail.com">MyThink@gmail.com</a></td>
+			</tr>
+			<tr>
+				<th scope="row">2</th>
+				<td>contact tel</td>
+				<td><a href="callto:+666999333">+666999333</a></td>
+			</tr>
+			<tr>
+				<th scope="row">3</th>
+				<td>social network</td>
+				<td>@MyThink</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+{% endblock %}

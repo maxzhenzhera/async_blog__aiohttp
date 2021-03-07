@@ -1,0 +1,37 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Registering{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Join to <i>MyThink</i> community!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">SIGN UP</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/user/register/">
+
+			<div class="mb-3">
+				<label for="exampleInputEmail1" class="form-label">Login</label>
+				<input class="form-control" name="login" minlength="5" required>
+			</div>
+			<div class="mb-3">
+				<label for="exampleInputPassword1" class="form-label">Password</label>
+				<input type="password" class="form-control" id="exampleInputPassword1" name="password" minlength="5" required>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Register</button>
+
+		</form>
+
+	</div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Login{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Authorize in <i>MyThink</i> and get new features!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">SIGN IN</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/user/login/">
+
+			<div class="mb-3">
+				<label for="exampleInputEmail1" class="form-label">Login</label>
+				<input class="form-control" name="login" minlength="5" required>
+			</div>
+			<div class="mb-3">
+				<label for="exampleInputPassword1" class="form-label">Password</label>
+				<input type="password" class="form-control" id="exampleInputPassword1" name="password" minlength="5" required>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Authorize</button>
+
+		</form>
+
+	</div>
+
+{% endblock %}

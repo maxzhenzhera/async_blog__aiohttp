@@ -1,0 +1,46 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Edit Info{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Editing of your <i>MyThink</i> account</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">EDIT INFO</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<br>
+
+		<form method="POST" action="/user/settings/edit/info/">
+
+			<p class="text-info">Do you want to change <i>About me</i>?</p>
+			<div class="mb-3">
+				<label for="exampleFormControlTextarea1">New <i>About me</i></label>
+				{% if session.user.about_me %}
+					<textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="new_about_me">{{ session.user.about_me }}</textarea>
+				{% else %}
+					<textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="new_about_me"></textarea>
+				{% endif %}
+			</div>
+
+			<p class="text-warning">It is mandatory to fill password field for changing!</p>
+			<div class="mb-3">
+				<label for="exampleInputPassword1" class="form-label">Password [for verifying your identity]</label>
+				<input type="password" class="form-control" id="exampleInputPassword1" name="password" minlength="5" required>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Edit</button>
+
+		</form>
+
+	</div>
+
+{% endblock %}

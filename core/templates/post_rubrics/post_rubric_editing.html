@@ -1,0 +1,49 @@
+{% extends "basis/basis.html" %}
+
+{% block title %}Post Rubric Editing{% endblock %}
+
+{% block content %}
+
+	<h1>Edit <i>Post Rubric</i>!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">POST RUBRIC EDITING</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/posts/rubrics/edit/">
+
+			<input type="hidden" name="id" value="{{ post_rubric.id }}">
+
+			<div class="mb-3">
+				<label for="title" class="form-label">Title</label>
+				<input class="form-control" name="title" value="{{ post_rubric.title }}" required minlength="3">
+			</div>
+
+			<br>
+
+			<button type="submit" class="btn btn-primary">Edit</button>
+
+		</form>
+
+		<br>
+		<hr>
+
+		<form method="POST" action="/posts/rubrics/delete/">
+
+			<input type="hidden" name="id" value="{{ post_rubric.id }}">
+
+			<p class="fs-4 text-warning">If you will delete Post Rubric - you will NOT delete all posts with this rubric! Posts rubrics will be changed on none value. Be aware!</p>
+
+			<br>
+
+			<button type="submit" class="btn btn-danger">Delete</button>
+
+		</form>
+	</div>
+
+{% endblock %}

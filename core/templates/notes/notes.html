@@ -1,0 +1,67 @@
+<!-- Page wtih pagination -->
+{% extends "basis/page_with_pagination.html" %}
+
+<!-- Insert new title -->
+{% block title %}MyNotes{% endblock %}
+
+<!-- Inner content of page with pagination -->
+{% block inner_content %}
+<!-- `Welcome` text -->
+	<h1>Here`s your <i>Notes</i>!</h1>
+
+	<!-- Help links -->
+	<div class="info">
+		<div class="info-link">
+			<p class="text-center fs-3"><a href="{{ url('notes-create') }}" class="font-monospace">Create a new Note</a></p>
+		</div>
+
+		<div class="info-link">
+			<p class="text-center fs-3"><a href="{{ url('notes-rubrics-create') }}">Create a new Note Rubric</a></p>
+		</div>
+
+		<div class="info-link">
+			<p class="text-center fs-3"><a href="{{ url('notes-rubrics') }}">Note Rubrics</a></p>
+		</div>
+
+		<!-- Search section - form for notes searching -->
+		<div class="info-link">
+			<form class="d-flex me-5 pe-5" method="GET" action="{{ url('notes') }}">
+				<input class="form-control me-2" type="search" placeholder="Note title" aria-label="Search" name="keyword">
+				<button class="btn btn-outline-success" type="submit" id="wide-search-button">Search note by title</button>
+			</form>
+		</div>
+
+	</div>
+
+	<div class="notes">
+		<table class="table table-dark table-hover text-center">
+			<thead>
+				<tr>
+					<th scope="col">Notes</th>
+					<th scope="col">Created</th>
+					<th scope="col">Rubric</th>
+					<th scope="col">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+
+					{% for note in notes %}
+						<tr>
+							<td class="text-center fs-5" style="width: 70%"><a href="{{ url('notes-id', id=note.id) }}" class="pointer">{{ note.content }}</a></td>
+							<td class="text-center fs-5">{{ note.created_date }}</td>
+
+							{% if note.rubric_id %}
+								<td class="text-center fs-5"><a class="pointer" onclick="addUrlParameter('rubric', {{ note.rubric_id }})">{{ note.rubric }}</a></td>
+							{% else %}
+								<td class="text-center fs-5"> - </td>
+							{% endif %}
+
+							<td><button type="button" class="btn btn-primary" onclick="location.href='{{ url('notes-id-edit', id=note.id) }}';">Edit</button></td>
+						</tr>
+					{% endfor %}
+
+			</tbody>
+		</table>
+	</div>
+
+{% endblock %}

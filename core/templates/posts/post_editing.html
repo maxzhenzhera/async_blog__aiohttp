@@ -1,0 +1,69 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Think Editing{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Edit <i>Think</i>!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">POST EDITING</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/posts/edit/">
+
+			<input type="hidden" name="id" value="{{ post.id }}">
+
+			<div class="mb-3">
+				<label for="title" class="form-label">Title</label>
+				<input class="form-control" name="title" value="{{ post.title }}" required minlength="5">
+			</div>
+			<div class="mb-3">
+				<label for="content" class="form-label">Content</label>
+				<br>
+				<textarea class="form-control" name="content" required minlength="5">{{ post.content }}</textarea>
+			</div>
+
+			<div class="mb-3">
+				<label for="content" class="form-label">Rubric</label>
+				<select class="form-select" name="rubric_id">
+
+					<option selected>None</option>
+						{% for rubric in rubrics %}
+							{% if rubric.id == post.rubric_id %}
+								<option value="{{ rubric.id }}" selected>{{ rubric.title }}</option>
+							{% else %}
+								<option value="{{ rubric.id }}">{{ rubric.title }}</option>
+							{% endif %}
+						{% endfor %}
+
+				</select>
+			</div>
+
+
+			<br>
+
+			<button type="submit" class="btn btn-primary">Edit</button>
+
+		</form>
+
+		<br>
+		<hr>
+
+		<form method="POST" action="/posts/delete/">
+
+			<input type="hidden" name="id" value="{{ post.id }}">
+
+			<button type="submit" class="btn btn-danger">Delete</button>
+		</form>
+
+	</div>
+
+{% endblock %}

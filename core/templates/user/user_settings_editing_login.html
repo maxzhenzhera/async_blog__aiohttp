@@ -1,0 +1,42 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Edit Login{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Editing of your <i>MyThink</i> account</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">EDIT LOGIN</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<br>
+
+		<form method="POST" action="/user/settings/edit/login/">
+
+			<p class="text-info">Do you have a desire to change login (and at the same time <b>MyThink</b> nick)?</p>
+			<div class="mb-3">
+				<label for="exampleInputEmail1" class="form-label">New login</label>
+				<input class="form-control" name="new_login" minlength="5" required>
+			</div>
+
+			<p class="text-warning">It is mandatory to fill password field for changing!</p>
+			<div class="mb-3">
+				<label for="exampleInputPassword1" class="form-label">Password [for verifying your identity]</label>
+				<input type="password" class="form-control" id="exampleInputPassword1" name="password" minlength="5" required>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Edit</button>
+
+		</form>
+
+	</div>
+
+{% endblock %}

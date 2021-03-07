@@ -1,0 +1,71 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Edit Settings{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Settings of your <i>MyThink</i> account</h1>
+
+	<div class="info">
+
+		<div class="info-link">
+			<p><a href="{{ url('user-settings-edit-login') }}">Edit login</a></p>
+		</div>
+
+		<div class="info-link">
+			<p><a href="{{ url('user-settings-edit-password') }}">Edit password</a></p>
+		</div>
+
+		<div class="info-link">
+			<p><a href="{{ url('user-settings-edit-info') }}">Edit info</a></p>
+		</div>
+
+		<div class="info-link">
+			<p><a href="{{ url('user-settings-edit-image') }}">Edit image</a></p>
+		</div>
+
+	</div>
+
+	<div class="settings">
+
+		<div class="setting">
+			<h3>Login</h3>
+			<hr>
+			<p>{{ user.login }}</p>
+			<hr>
+			<a href="{{ url('user-settings-edit-login') }}" class="fs-3">Edit login</a>
+		</div>
+
+		<div class="setting">
+			<h3>Info</h3>
+			<h5>About_me</h4>
+			<hr>
+			{% if user.about_me%}
+				<p>{{ user.about_me }}</p>
+			{% else %}
+				<p>-</p>
+			{% endif %}
+			<hr>
+			<a href="{{ url('user-settings-edit-info') }}" class="fs-3">Edit info</a>
+		</div>
+
+		<div class="setting text-center">
+			<h3>Image</h3>
+			<hr>
+
+			{% if user.image_path %}
+				<img src="{{ static(user.image_path) }}" alt="avatar">
+			{% else %}
+				<img src="{{ static('images/user_images/default.jpg') }}" alt="avatar">
+			{% endif %}
+
+			<hr>
+			<a href="{{ url('user-settings-edit-image') }}" class="fs-3">Edit image</a>
+		</div>
+
+	</div>
+
+
+{% endblock %}

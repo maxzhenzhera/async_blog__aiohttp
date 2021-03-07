@@ -1,0 +1,47 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Thinker{% endblock %}
+
+{% block content %}
+
+<!-- Main header -->
+	<h1>Thinker <b>{{ user.login }}</b></h1>
+
+	<!-- Help links -->
+	<div class="info">
+
+		<div class="info-link">
+			<p><a href="{{ url('posts', query_={'thinker': user.id}) }}">See posts of this thinker</a></p>
+		</div>
+
+	</div>
+
+	<div class="user-data">
+
+		<div class="user-data-block">
+			{% if user.image_path %}
+				<img src="{{ static(user.image_path) }}" alt="avatar">
+			{% else %}
+				<img src="{{ static('images/user_images/default.jpg') }}" alt="avatar">
+			{% endif %}
+		</div>
+
+		<div class="user-data-block text-center">
+			<!-- <img src="" alt=""> -->
+			<p>My nick on this website is <b>{{ user.login }}</b></p>
+		</div>
+
+		{% if user.about_me %}
+
+			<div class="user-data-block text-center">
+
+				<p>About me: {{ user.about_me }}</p>
+
+			</div>
+			
+		{% endif %}
+
+	</div>
+
+{% endblock %}

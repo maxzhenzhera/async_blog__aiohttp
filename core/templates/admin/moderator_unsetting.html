@@ -1,0 +1,60 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Moderator Unsetting{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Unset <i>Moderator</i>!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">MODERATOR UNSETTING</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/admin/unset/moderator/">
+
+			<div class="mb-3">
+				<label for="title" class="form-label">USER ID</label>
+				<input class="form-control" name="id" required minlength="1">
+			</div>
+
+			<hr>
+
+			<p>User will have account after deleting `moderator` grant!</p>
+
+			<br>
+
+			<button type="submit" class="btn btn-danger">Delete Moderator</button>
+
+		</form>
+
+	</div>
+
+	<div class="moderators">
+		<table class="table table-dark table-hover">
+		<thead>
+			<tr>
+				<th scope="col">USER ID</th>
+				<th scope="col">USER NICK</th>
+				<th scope="col">LINK ON THINKER</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for user in moderators %}
+				<tr>
+					<td>{{ user.id }}</td>
+					<td>{{ user.login }}</td>
+					<td><a href="{{ url('thinker-id', id=user.id) }}">Click</a></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	</div>
+
+{% endblock %}

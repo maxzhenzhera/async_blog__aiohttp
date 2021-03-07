@@ -1,0 +1,53 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Think Rubrics{% endblock %}
+
+{% block content %}
+
+	<!-- main header -->
+	<h1><i>Think</i> Rubrics</h1>
+
+	<div class="post-rubrics">
+
+		<!-- admin can create and edit rubrics -->
+		{% if 'user' in session and session.user.is_admin %}
+			<table class="table table-dark table-hover">
+				<thead>
+					<tr>
+						<th scope="col">Title</th>
+						<th scope="col">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for rubric in rubrics %}
+						<tr>
+							<td><a class="pointer" href="{{ url('posts', query_={'rubric': rubric.id}) }}">{{ rubric.title }}</a></td>
+							<td><button type="button" class="btn btn-primary" onclick="location.href='{{ url('posts-rubrics-id-edit', id=rubric.id) }}';">Edit</button></td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+		<!-- simple user can not create and edit rubrics -->
+		{% else %}
+			<table class="table table-dark table-hover">
+				<thead>
+					<tr>
+						<th scope="col">Title</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for rubric in rubrics %}
+						<tr>
+							<td><a class="pointer" href="{{ url('posts', query_={'rubric': rubric.id}) }}">{{ rubric.title }}</a></td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+		{% endif %}
+
+	</div>
+
+{% endblock %}

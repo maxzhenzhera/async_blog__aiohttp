@@ -1,0 +1,44 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Note Creation{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Create new <i>Note</i>!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">NOTE CREATION</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/notes/create/">
+
+			<div class="mb-3">
+				<label for="content" class="form-label">Content</label>
+				<br>
+				<textarea class="form-control" name="content" minlength=3 required></textarea>
+			</div>
+
+			<div class="mb-3">
+				<label for="content" class="form-label">Rubric</label>
+				<select class="form-select" name="rubric_id">
+						<option selected>None</option>
+						{% for rubric in rubrics %}
+							<option value="{{ rubric.id }}">{{ rubric.title }}</option>
+						{% endfor %}
+				</select>
+			</div>
+
+			<br>
+
+			<button type="submit" class="btn btn-primary">Create</button>
+		</form>
+	</div>
+
+{% endblock %}

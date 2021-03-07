@@ -1,0 +1,48 @@
+{% extends "basis/basis.html" %}
+{% block title %}New Note Rubric{% endblock %}
+
+{% block content %}
+
+	<h1>Edit <i>Note Rubric</i>!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">NOTE RUBRIC EDITING</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/notes/rubrics/edit/">
+
+			<input type="hidden" name="id" value="{{ note_rubric.id }}">
+
+			<div class="mb-3">
+				<label for="title" class="form-label">Title</label>
+				<input class="form-control" name="title" value="{{ note_rubric.title }}" required minlength="3">
+			</div>
+
+			<br>
+
+			<button type="submit" class="btn btn-primary">Edit</button>
+
+		</form>
+
+		<br>
+		<hr>
+
+		<form method="POST" action="/notes/rubrics/delete/">
+
+			<input type="hidden" name="id" value="{{ note_rubric.id }}">
+
+			<p class="fs-4 text-warning">If you will delete Note Rubric - you will delete all notes with this rubric! Be aware!</p>
+
+			<br>
+
+			<button type="submit" class="btn btn-danger">Delete</button>
+
+		</form>
+	</div>
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "basis/basis.html" %}
+
+<!-- Insert new title -->
+{% block title %}Think Moderating{% endblock %}
+
+<!-- Content block -->
+{% block content %}
+
+	<h1>Edit <i>Think</i>!</h1>
+
+	<div class="mx-auto form">
+		<h2 class="text-center">POST MODERATING</h2>
+
+		{% if message %}
+			<div class="alert alert-danger" role="alert">
+				{{ message }}
+			</div>
+		{% endif %}
+
+		<form method="POST" action="/moderator/posts/delete/">
+
+			<div class="mb-3">
+				<label for="title" class="form-label">Post ID</label>
+				<input class="form-control" name="id" required minlength="1">
+			</div>
+
+			<button type="submit" class="btn btn-danger">Delete</button>
+
+		</form>
+
+	</div>
+
+{% endblock %}
