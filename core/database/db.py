@@ -1,84 +1,98 @@
 """
-Contains functions that execute CRUD operations with db.
+Contains functions that execute operations with db.
 
 .. exception:: RecordNotFoundError(Exception)
     Raised when record in the DB is not found
 
 .. decorator:: check_record_in_db(db_function: Callable) -> Callable
 
-.. function:: execute_query(connection: aiomysql.Connection, query: str, params: dict) -> None
-    Execute query (shortcut for execution query [insert, update, delete])
+.. function:: execute_query(connection: aiomysql.Connection, query: str, params: dict) -> None:
+    Shortcut function for operations except that fetch some info
 .. function:: fetch_posts_possible_pages_quantity(connection: aiomysql.Connection, params: validators.PostUrlParams,
-        *args, user_id: Optional[int] = None) -> int
-    Return possible page quantity for posts
+        *args: Any, user_id: Optional[int] = None) -> int:
+    CRUD function
 .. function:: fetch_notes_possible_pages_quantity(connection: aiomysql.Connection, params: validators.NoteUrlParams,
-        user_id: int) -> int
-    Return possible page quantity for notes
-.. function:: fetch_all_post_rubrics(connection: aiomysql.Connection) -> list[dict[str, Union[int, str]]]
-    Fetch all post rubrics
-.. function:: fetch_one_post_rubric(connection: aiomysql.Connection, post_rubric_id: int) -> dict[str, Union[int, str]]
-    Fetch one post rubric
-.. function:: fetch_all_posts(connection: aiomysql.Connection, params: validators.PostUrlParams, *args,
-        user_id: Optional[int] = None) -> list[dict[str, Union[int, str, datetime.datetime]]]
-    Fetch all posts
+        user_id: int ) -> int:
+    CRUD function
+.. function:: fetch_all_post_rubrics(connection: aiomysql.Connection) -> list[dict[str, Union[int, str]]]:
+    CRUD function
+.. function:: fetch_one_post_rubric(connection: aiomysql.Connection, post_rubric_id: int) -> dict[str, Union[int, str]]:
+    CRUD function
+.. function:: fetch_all_posts(connection: aiomysql.Connection, params: validators.PostUrlParams, *args: Any,
+        user_id: Optional[int] = None) -> list[dict[str, Union[int, str, datetime.datetime]]]:
+    CRUD function
 .. function:: fetch_one_post(connection: aiomysql.Connection, post_id: int
-        ) -> dict[str, Union[int, str, datetime.datetime]]
-    Fetch one post
-.. function:: fetch_one_random_post(connection: aiomysql.Connection) -> dict[str, Union[int, str, datetime.datetime]]
-    Fetch one random post
-.. function:: fetch_all_note_rubrics(connection: aiomysql.Connection, user_id: int) -> list[dict[str, Union[int, str]]]
-    Fetch all note rubrics
-.. function:: fetch_one_note_rubric(connection: aiomysql.Connection, note_rubric_id: int) -> dict[str, Union[int, str]]
-    Fetch one note rubric
+        ) -> dict[str, Union[int, str, datetime.datetime]]:
+    CRUD function
+.. function:: fetch_one_random_post(connection: aiomysql.Connection) -> dict[str, Union[int, str, datetime.datetime]]:
+    CRUD function
+.. function:: fetch_all_note_rubrics(connection: aiomysql.Connection, user_id: int) -> list[dict[str, Union[int, str]]]:
+    CRUD function
+.. function:: fetch_one_note_rubric(connection: aiomysql.Connection, note_rubric_id: int) -> dict[str, Union[int, str]]:
+    CRUD function
 .. function:: fetch_all_notes(connection: aiomysql.Connection, user_id: int, params: validators.NoteUrlParams
-        ) -> list[dict[str, Union[int, str, datetime.datetime]]]
-    Fetch all notes
+        ) -> list[dict[str, Union[int, str, datetime.datetime]]]:
+    CRUD function
 .. function:: fetch_one_note(connection: aiomysql.Connection, note_id: int
-        ) -> dict[str, Union[int, str, datetime.datetime]]
-    Fetch one note
+        ) -> dict[str, Union[int, str, datetime.datetime]]:
+    CRUD function
 .. function:: fetch_one_user(connection: aiomysql.Connection, *args, user_id: Optional[int] = None,
         login: Optional[str] = None, password: Optional[str] = None) -> dict[str, Union[int, str]]:
-    Fetch one user
-.. function:: insert_post_rubric(connection: aiomysql.Connection, post_rubric: validators.PostRubricCreation) -> None
-    Insert post rubric
-.. function:: insert_post(connection: aiomysql.Connection, post: validators.PostCreation) -> None
-    Insert post
-.. function:: insert_note_rubric(connection: aiomysql.Connection, note_rubric: validators.NoteRubricCreation) -> None
-    Insert note rubric
-.. function:: insert_note(connection: aiomysql.Connection, note: validators.NoteCreation) -> None
-    Insert note
-.. function:: insert_user(connection: aiomysql.Connection, user: validators.UserCreation) -> None
-    Insert user
+    CRUD function
+.. function:: fetch_all_moderators(connection: aiomysql.Connection) -> list[dict[str, Union[int, str]]]:
+    CRUD function
+.. function:: insert_post_rubric(connection: aiomysql.Connection, post_rubric: validators.PostRubricCreation) -> None:
+    CRUD function
+.. function:: insert_post(connection: aiomysql.Connection, post: validators.PostCreation) -> None:
+    CRUD function
+.. function:: insert_note_rubric(connection: aiomysql.Connection, note_rubric: validators.NoteRubricCreation) -> None:
+    CRUD function
+.. function:: insert_note(connection: aiomysql.Connection, note: validators.NoteCreation) -> None:
+    CRUD function
+.. function:: insert_user(connection: aiomysql.Connection, user: validators.UserCreation, *args,
+        user_is_admin: bool = False) -> None:
+    CRUD function
 .. function:: update_post_rubric(connection: aiomysql.Connection, post_rubric_id: int,
-        post_rubric: validators.PostRubricCreation) -> None
-    Update post rubric
-.. function:: update_post(connection: aiomysql.Connection, post_id: int, post: validators.PostCreation) -> None
-    Update post
+        post_rubric: validators.PostRubricEditing) -> None:
+    CRUD function
+.. function:: update_post(connection: aiomysql.Connection, post_id: int, post: validators.PostEditing) -> None:
+    CRUD function
 .. function:: update_note_rubric(connection: aiomysql.Connection, note_rubric_id: int,
-        note_rubric: validators.NoteRubricCreation) -> None
-    Update note rubric
-.. function:: update_note(connection: aiomysql.Connection, note_id: int, note: validators.NoteCreation) -> None
-    Update note
-.. function:: update_user(connection: aiomysql.Connection, user_id: int, user: validators.UserCreation) -> None
-    Update user
-.. function:: delete_post_rubric(connection: aiomysql.Connection, post_rubric_id: int) -> None
-    Delete post rubric
-.. function:: delete_post(connection: aiomysql.Connection, post_id: int,) -> None
-    Delete post
-.. function:: delete_note_rubric(connection: aiomysql.Connection, note_rubric_id: int) -> None
-    Delete note rubric
-.. function:: delete_note(connection: aiomysql.Connection, note_id: int,) -> None
-    Delete note
-.. function:: delete_user(connection: aiomysql.Connection, user_id: int) -> None
-    Delete user
+        note_rubric: validators.NoteRubricEditing) -> None:
+    CRUD function
+.. function:: update_note(connection: aiomysql.Connection, note_id: int, note: validators.NoteEditing) -> None:
+    CRUD function
+.. function:: update_user_login(connection: aiomysql.Connection, user_id: int, new_login: str) -> None:
+    CRUD function
+.. function:: update_user_password(connection: aiomysql.Connection, user_id: int, new_password: str) -> None:
+    CRUD function
+.. function:: update_user_info(connection: aiomysql.Connection, user_id: int,
+        new_info: validators.UserSettingsEditingInfo) -> None:
+    CRUD function
+.. function:: update_user_image_path(connection: aiomysql.Connection, user_id: int,
+        new_image_path: Optional[pathlib.Path]) -> None:
+    CRUD function
+.. function:: delete_post_rubric(connection: aiomysql.Connection, post_rubric_id: int) -> None:
+    CRUD function
+.. function:: delete_post(connection: aiomysql.Connection, post_id: int) -> None:
+    CRUD function
+.. function:: delete_note_rubric(connection: aiomysql.Connection, note_rubric_id: int) -> None:
+    CRUD function
+.. function:: delete_note(connection: aiomysql.Connection, note_id: int,) -> None:
+    CRUD function
+.. function:: delete_user(connection: aiomysql.Connection, user_id: int) -> None:
+    CRUD function
+.. function:: add_user_in_moderators(connection: aiomysql.Connection, user_id: int) -> None:
+    Set moderator grant for user
+.. function:: delete_user_from_moderators(connection: aiomysql.Connection, user_id: int) -> None:
+    Unet moderator grant for user
 
 .. const:: jinja_sql
     Template engine for sql on Jinja basis
 """
 
 import datetime
-import math
-import random
+import pathlib
 from functools import wraps
 from typing import (
     Any,
@@ -88,6 +102,7 @@ from typing import (
 )
 
 import aiomysql
+import math
 from jinjasql import JinjaSql
 
 from . import validators
@@ -195,7 +210,7 @@ async def fetch_posts_possible_pages_quantity(connection: aiomysql.Connection, p
         WHERE 
             1 = 1
             {% if rubric_id %}
-                AND `post_rubric_id` = {{ rubric_id }}
+                AND `rubric_id` = {{ rubric_id }}
             {% endif %}
             {% if search_word %}
                 AND MATCH (`posts`.`title`, `posts`.`content`) AGAINST ({{ search_word }})
@@ -206,7 +221,8 @@ async def fetch_posts_possible_pages_quantity(connection: aiomysql.Connection, p
         ;
     """
     params = params.dict(by_alias=True)
-    params['user_id'] = user_id
+    if 'user_id' not in params and user_id is not None:
+        params['user_id'] = user_id
 
     query, bound_params = jinja_sql.prepare_query(query_template, params)
 
@@ -244,7 +260,10 @@ async def fetch_notes_possible_pages_quantity(connection: aiomysql.Connection, p
         WHERE
             `notes`.`user_id` = {{ user_id }}
             {% if rubric_id %}
-                AND `note_rubric_id` = {{ rubric_id }}
+                AND `rubric_id` = {{ rubric_id }}
+            {% endif %}
+            {% if search_word %}
+                AND MATCH (`notes`.`content`) AGAINST ({{ search_word }})
             {% endif %}
         ; 
     """
@@ -315,7 +334,7 @@ async def fetch_one_post_rubric(connection: aiomysql.Connection, post_rubric_id:
 
 async def fetch_all_posts(connection: aiomysql.Connection, params: validators.PostUrlParams,
                           *args: Any,
-                          user_id: Optional[int] = None,
+                          user_id: Optional[int] = None
                           ) -> list[dict[str, Union[int, str, datetime.datetime]]]:
     """
     Fetch all posts (considering extra arguments).
@@ -333,12 +352,21 @@ async def fetch_all_posts(connection: aiomysql.Connection, params: validators.Po
 
     query_template = """
         SELECT
-            `posts`.*,
-            `post_rubrics`.`title` AS `rubric`
+            `posts`.`id` AS `id`,
+            `posts`.`title` AS `title`,
+            LEFT(`posts`.`content`, 100) AS `content`,
+            `posts`.`created_date` AS `created_date`,
+            `posts`.`edited_date` AS `edited_date`,
+            `posts`.`user_id` AS `user_id`,
+            `posts`.`rubric_id` AS `rubric_id`,
+            `post_rubrics`.`title` AS `rubric`,
+            `users`.`login` AS `author`
         FROM
             `posts`
                 LEFT JOIN
             `post_rubrics` ON `posts`.`rubric_id` = `post_rubrics`.`id`
+                LEFT JOIN
+            `users` ON `posts`.`user_id` = `users`.`id`
         WHERE 
             1 = 1
             {% if rubric_id %}
@@ -355,7 +383,8 @@ async def fetch_all_posts(connection: aiomysql.Connection, params: validators.Po
         ;
     """
     params = params.dict(by_alias=True)
-    params['user_id'] = user_id
+    if user_id:
+        params['user_id'] = user_id
     params['offset'] = (params['page_number'] - 1) * params['rows_quantity']
 
     query, bound_params = jinja_sql.prepare_query(query_template, params)
@@ -384,12 +413,21 @@ async def fetch_one_post(connection: aiomysql.Connection, post_id: int
 
     query = """
         SELECT
-            `posts`.*,
-            `post_rubrics`.`title` AS `rubric`
+            `posts`.`id` AS `id`,
+            `posts`.`title` AS `title`,
+            `posts`.`content` AS `content`,
+            `posts`.`created_date` AS `created_date`,
+            `posts`.`edited_date` AS `edited_date`,
+            `posts`.`user_id` AS `user_id`,
+            `posts`.`rubric_id` AS `rubric_id`,
+            `post_rubrics`.`title` AS `rubric`,
+            `users`.`login` AS `author`
         FROM
             `posts`
                 LEFT JOIN
             `post_rubrics` ON `posts`.`rubric_id` = `post_rubrics`.`id`
+                LEFT JOIN
+            `users` ON `posts`.`user_id` = `users`.`id`
         WHERE
             `posts`.`id` = %(post_id)s
         ;
@@ -424,15 +462,16 @@ async def fetch_one_random_post(connection: aiomysql.Connection) -> dict[str, Un
             `posts`
                 LEFT JOIN
             `post_rubrics` ON `posts`.`rubric_id` = `post_rubrics`.`id`
-        ORDER BY %(order_key)s LIMIT 1
+        ORDER BY RAND()
+        LIMIT 1
         ;
     """
-    params = {
-        'order_key': random.random()
-    }
+    # params = {
+    #     'order_key': random.random()
+    # }
 
     async with connection.cursor(aiomysql.cursors.DictCursor) as cursor:
-        await cursor.execute(query, params)
+        await cursor.execute(query)
         post = await cursor.fetchone()
 
     return post
@@ -454,7 +493,7 @@ async def fetch_all_note_rubrics(connection: aiomysql.Connection, user_id: int) 
     :rtype: list[dict[str, Union[int, str]]]
     """
 
-    query = 'SELECT * FROM `note_rubrics` WHERE `user_id` = %(user_id)s ORDER BY `edited_date` DESC;'
+    query = 'SELECT * FROM `note_rubrics` WHERE `user_id` = %(user_id)s;'
     params = {
         'user_id': user_id
     }
@@ -510,7 +549,11 @@ async def fetch_all_notes(connection: aiomysql.Connection, user_id: int, params:
 
     query_template = """
         SELECT 
-            `notes`.*, 
+            `notes`.`id` AS `id`,
+            LEFT(`notes`.`content`, 200) AS `content`,
+            `notes`.`created_date` AS `created_date`,
+            `notes`.`edited_date` AS `edited_date`,
+            `notes`.`rubric_id` AS `rubric_id`,
             `note_rubrics`.title AS `rubric`
         FROM
             `notes`
@@ -521,6 +564,10 @@ async def fetch_all_notes(connection: aiomysql.Connection, user_id: int, params:
             {% if rubric_id %}
                 AND `rubric_id` = {{ rubric_id }}
             {% endif %}
+            {% if search_word %}
+                AND MATCH (`notes`.`content`) AGAINST ({{ search_word }})
+            {% endif %}
+        ORDER BY `notes`.`created_date` DESC
         LIMIT {{ offset }}, {{ rows_quantity }}
         ; 
     """
@@ -580,7 +627,7 @@ async def fetch_one_note(connection: aiomysql.Connection, note_id: int
 
 @check_record_in_db
 async def fetch_one_user(connection: aiomysql.Connection,
-                         *args: Any,
+                         *args,
                          user_id: Optional[int] = None, login: Optional[str] = None, password: Optional[str] = None,
                          ) -> dict[str, Union[int, str]]:
     """
@@ -639,6 +686,26 @@ async def fetch_one_user(connection: aiomysql.Connection,
         user = await cursor.fetchone()
 
     return user
+
+
+async def fetch_all_moderators(connection: aiomysql.Connection) -> list[dict[str, Union[int, str]]]:
+    """
+    Fetch all users with moderator grant.
+
+    :param connection: db connection
+    :type connection: aiomysql.Connection
+
+    :return: list of the moderators
+    :rtype: list[dict[str, Union[int, str]]]
+    """
+
+    query = 'SELECT * FROM `moderators`;'
+
+    async with connection.cursor(aiomysql.DictCursor) as cursor:
+        await cursor.execute(query)
+        moderators = await cursor.fetchall()
+
+    return moderators
 
 
 # # ------------------------- CREATE QUERIES
@@ -733,7 +800,8 @@ async def insert_note(connection: aiomysql.Connection, note: validators.NoteCrea
 # # # ------------------------- Users
 
 
-async def insert_user(connection: aiomysql.Connection, user: validators.UserCreation) -> None:
+async def insert_user(connection: aiomysql.Connection, user: validators.UserCreation, *args,
+                      user_is_admin: bool = False) -> None:
     """
     Insert new user.
 
@@ -741,17 +809,20 @@ async def insert_user(connection: aiomysql.Connection, user: validators.UserCrea
     :type connection: aiomysql.Connection
     :param user: validated data of the user
     :type user: validators.UserCreation
+    :param user_is_admin: with this flag will be inserted user with admin grant
+    :type user_is_admin: bool
 
     :return: None
     :rtype: None
     """
 
     query = """
-        INSERT INTO `users` (`login`, `password`) 
-        VALUES (%(login)s, %(password)s)
+        INSERT INTO `users` (`login`, `password`, `is_admin`) 
+        VALUES (%(login)s, %(password)s, %(is_admin)s)
         ;
     """
     params = user.dict(by_alias=True)
+    params['is_admin'] = user_is_admin
 
     await execute_query(connection, query, params)
 
@@ -874,7 +945,7 @@ async def update_note(connection: aiomysql.Connection, note_id: int, note: valid
         UPDATE `notes` 
         SET 
             `content` = %(content)s,
-            `note_rubric_id` = %(rubric_id)s
+            `rubric_id` = %(rubric_id)s
         WHERE
             `id` = %(note_id)s;
     """
@@ -887,33 +958,124 @@ async def update_note(connection: aiomysql.Connection, note_id: int, note: valid
 # # # ------------------------- Users
 
 
-# async def update_user(connection: aiomysql.Connection, user_id: int, user: validators.UserCreation) -> None:
-#     """
-#     Update the user.
-#
-#     :param connection: db connection
-#     :type connection: aiomysql.Connection
-#     :param user_id: user id
-#     :type user_id: int
-#     :param user: validated data of the user
-#     :type user: validators.UserCreation
-#
-#     :return: None
-#     :rtype: None
-#     """
-#
-#     query = """
-#         UPDATE `users`
-#         SET
-#             `login` = %(login)s,
-#             `password` = %(password)s
-#         WHERE
-#             `id` = %(user_id)s;
-#     """
-#     params = user.dict(by_alias=True)
-#     params['user_id'] = user_id
-#
-#     await execute_query(connection, query, params)
+async def update_user_login(connection: aiomysql.Connection, user_id: int, new_login: str) -> None:
+    """
+    Update the user login.
+
+    :param connection: db connection
+    :type connection: aiomysql.Connection
+    :param user_id: user id
+    :type user_id: int
+    :param new_login: new login
+    :type new_login: str
+
+    :return: None
+    :rtype: None
+    """
+
+    query = """
+        UPDATE `users`
+        SET
+            `login` = %(new_login)s
+        WHERE
+            `id` = %(user_id)s;
+    """
+    params = {
+        'user_id': user_id,
+        'new_login': new_login
+    }
+
+    await execute_query(connection, query, params)
+
+
+async def update_user_password(connection: aiomysql.Connection, user_id: int, new_password: str) -> None:
+    """
+    Update the user password.
+
+    :param connection: db connection
+    :type connection: aiomysql.Connection
+    :param user_id: user id
+    :type user_id: int
+    :param new_password: hashed user password
+    :type new_password: str
+
+    :return: None
+    :rtype: None
+    """
+
+    query = """
+        UPDATE `users`
+        SET
+            `password` = %(new_password)s
+        WHERE
+            `id` = %(user_id)s;
+    """
+    params = {
+        'new_password': new_password,
+        'user_id': user_id
+    }
+
+    await execute_query(connection, query, params)
+
+
+async def update_user_info(connection: aiomysql.Connection, user_id: int, new_info: validators.UserSettingsEditingInfo
+                           ) -> None:
+    """
+    Update the user info.
+
+    :param connection: db connection
+    :type connection: aiomysql.Connection
+    :param user_id: user id
+    :type user_id: int
+    :param new_info: new info
+    :type new_info: validators.UserSettingsEditingInfo
+
+    :return: None
+    :rtype: None
+    """
+
+    query = """
+        UPDATE `users`
+        SET
+            `about_me` = %(new_about_me)s
+        WHERE
+            `id` = %(user_id)s;
+    """
+    params = new_info.dict(by_alias=True)
+    params['user_id'] = user_id
+
+    await execute_query(connection, query, params)
+
+
+async def update_user_image_path(connection: aiomysql.Connection, user_id: int, new_image_path: Optional[pathlib.Path]
+                                 ) -> None:
+    """
+    Update the user image path.
+
+    :param connection: db connection
+    :type connection: aiomysql.Connection
+    :param user_id: user id
+    :type user_id: int
+    :param new_image_path: new image path
+    :type new_image_path: pathlib.Path
+
+    :return: None
+    :rtype: None
+    """
+
+    query = """
+        UPDATE `users`
+        SET
+            `image_path` = %(new_image_path)s
+        WHERE
+            `id` = %(user_id)s;
+    """
+    params = {
+        'user_id': user_id,
+        'new_image_path': new_image_path
+    }
+
+    await execute_query(connection, query, params)
 
 
 # # ------------------------- DELETE QUERIES
@@ -947,7 +1109,7 @@ async def delete_post_rubric(connection: aiomysql.Connection, post_rubric_id: in
     await execute_query(connection, query, params)
 
 
-async def delete_post(connection: aiomysql.Connection, post_id: int,) -> None:
+async def delete_post(connection: aiomysql.Connection, post_id: int) -> None:
     """
     Delete the post.
 
@@ -1054,3 +1216,57 @@ async def delete_user(connection: aiomysql.Connection, user_id: int) -> None:
 
 
 # ------------------------- Admin manipulations
+
+
+async def add_user_in_moderators(connection: aiomysql.Connection, user_id: int) -> None:
+    """
+    Give `moderator` grant to user.
+
+    :param connection: db connection
+    :type connection: aiomysql.Connection
+    :param user_id: user-id
+    :type user_id: int
+
+    :return: None
+    :rtype: None
+    """
+
+    query = """
+        UPDATE `users` 
+        SET 
+            `is_moderator` = 1
+        WHERE
+            `id` = %(user_id)s;
+        """
+    params = {
+        'user_id': user_id
+    }
+
+    await execute_query(connection, query, params)
+
+
+async def delete_user_from_moderators(connection: aiomysql.Connection, user_id: int) -> None:
+    """
+    Take away `moderator` grant from user.
+
+    :param connection: db connection
+    :type connection: aiomysql.Connection
+    :param user_id: user-id
+    :type user_id: int
+
+    :return: None
+    :rtype: None
+    """
+
+    query = """
+        UPDATE `users` 
+        SET 
+            `is_moderator` = 0
+        WHERE
+            `id` = %(user_id)s;
+        """
+    params = {
+        'user_id': user_id
+    }
+
+    await execute_query(connection, query, params)
