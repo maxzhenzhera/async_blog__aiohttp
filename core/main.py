@@ -11,11 +11,15 @@ import aiohttp
 import aiohttp.web
 import aiohttp_jinja2
 import jinja2
+from loguru import logger
 
 from .database.mysql import init_mysql, close_mysql
 from .middlewares import setup_middlewares
 from .routes import setup_routes
-from .settings import get_config
+from .settings import (
+    get_config,
+    ERROR_LOG
+)
 
 
 async def init_app() -> aiohttp.web.Application:
@@ -31,10 +35,14 @@ async def init_app() -> aiohttp.web.Application:
     # set app config
     app['config'] = get_config()
 
+    # set logger
+    logger.add(ERROR_LOG, level='ERROR')
+    app['logger'] = logger
+
     # setup Jinja2 template renderer
     aiohttp_jinja2.setup(
         app,
-        loader=jinja2.PackageLoader('core', 'templates')
+        loader=jinja2.PackageLoader('core')
     )
 
     # create db connection on startup, shutdown on exit
@@ -57,8 +65,6 @@ def main() -> None:
     :return: None
     :rtype: None
     """
-
-    # logger settings set might be here
 
     app = init_app()
 
