@@ -1,6 +1,8 @@
 """
 Contains custom error handlers.
 
+.. function:: handle_400(request) -> aiohttp.web.Response
+    Handle 400 http error
 .. function:: handle_401(request) -> aiohttp.web.Response
     Handle 401 http error
 .. function:: handle_403(request) -> aiohttp.web.Response
@@ -12,6 +14,8 @@ Contains custom error handlers.
 .. function:: handle_500(request) -> aiohttp.web.Response
     Handle 500 http error
 
+.. const:: ERROR_TEMPLATE_FILENAME
+    Filename of the error template
 .. const:: errors
     Mapping of pairs [http_code, error_handler]
 """
@@ -23,6 +27,22 @@ import aiohttp_jinja2
 __all__ = ['errors', ]
 
 
+# aiohttp_jinja use `/` separator on paths joining, so I continue use `/`
+ERROR_TEMPLATE_FILENAME = 'error/error.html'
+
+
+async def handle_400(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """ Handle http error {400 Bad Request} and return response with prepared template """
+    data = {
+        'first_digit': 4,
+        'second_digit': 0,
+        'third_digit': 0,
+        'message': 'It`s looks like something went wrong. Maybe, your data is incorrect! Try again!'
+    }
+
+    return aiohttp_jinja2.render_template(ERROR_TEMPLATE_FILENAME, request, data, status=400)
+
+
 async def handle_401(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """ Handle http error {401 Unauthorized} and return response with prepared template """
     data = {
@@ -32,7 +52,7 @@ async def handle_401(request: aiohttp.web.Request) -> aiohttp.web.Response:
         'message': 'Please, login first!'
     }
 
-    return aiohttp_jinja2.render_template('error.html', request, data, status=401)
+    return aiohttp_jinja2.render_template(ERROR_TEMPLATE_FILENAME, request, data, status=401)
 
 
 async def handle_403(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -44,7 +64,7 @@ async def handle_403(request: aiohttp.web.Request) -> aiohttp.web.Response:
         'message': 'Sorry, but it is forbidden for you :)'
     }
 
-    return aiohttp_jinja2.render_template('error.html', request, data, status=403)
+    return aiohttp_jinja2.render_template(ERROR_TEMPLATE_FILENAME, request, data, status=403)
 
 
 async def handle_404(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -56,7 +76,7 @@ async def handle_404(request: aiohttp.web.Request) -> aiohttp.web.Response:
         'message': 'Hmm... We are lost!'
     }
 
-    return aiohttp_jinja2.render_template('error.html', request, data, status=404)
+    return aiohttp_jinja2.render_template(ERROR_TEMPLATE_FILENAME, request, data, status=404)
 
 
 async def handle_405(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -68,7 +88,7 @@ async def handle_405(request: aiohttp.web.Request) -> aiohttp.web.Response:
         'message': 'You on a wrong way! This method not allowed!'
     }
 
-    return aiohttp_jinja2.render_template('error.html', request, data, status=405)
+    return aiohttp_jinja2.render_template(ERROR_TEMPLATE_FILENAME, request, data, status=405)
 
 
 async def handle_500(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -80,10 +100,11 @@ async def handle_500(request: aiohttp.web.Request) -> aiohttp.web.Response:
         'message': 'It is not you. It is me :) Sorry!'
     }
 
-    return aiohttp_jinja2.render_template('error.html', request, data, status=500)
+    return aiohttp_jinja2.render_template(ERROR_TEMPLATE_FILENAME, request, data, status=500)
 
 
 errors = {
+    400: handle_400,
     401: handle_401,
     403: handle_403,
     404: handle_404,
