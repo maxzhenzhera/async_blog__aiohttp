@@ -2,13 +2,17 @@
 Auxiliary functions and decorators.
 
 .. decorator:: view_decorator(inner_decorator_function: Callable) -> Callable:
-    Envelopes inner decorator function, support different types of views (functions, class-based).
+    Envelopes inner decorator function, support different types of views (functions, class-based)
+.. decorator:: handle_local_error(function: Callable = None, *args,
+        except_error: Union[Type[Exception], tuple[Type[Exception]]], raise_error: Type[Exception]  ) -> Callable
+    Envelopes any async function and handle particular error
 """
 
 from functools import wraps
 from typing import (
     Any,
     Callable,
+    Type,
     Union
 )
 
@@ -31,6 +35,8 @@ def view_decorator(inner_decorator_function: Callable) -> Callable:
 
     :return: inner function
     :rtype: Callable
+
+    :raises [in inner] ValueError: might be raised if not view function was enveloped (unexpected type of argument)
     """
 
     @wraps(inner_decorator_function)
@@ -65,5 +71,55 @@ def view_decorator(inner_decorator_function: Callable) -> Callable:
         )
 
         return inner_decorator_function_result
+
+    return inner
+
+
+def handle_local_error(function: Callable = None, *args,
+                       except_error: Union[Type[Exception], tuple[Type[Exception]]], raise_error: Type[Exception]
+                       ) -> Callable:
+    """
+    Envelopes any function and handle local error (that might be raised during function work).
+    It is compulsory to pass:
+        - as `except_error` - error type(s), that will be handled,
+        - as `raise_error` - error type, that will be raised [if `except_error` was handled].
+
+    'Errors should never pass silently.' - so, decorator always re-raises error if one was handled.
+
+    So, the main goal of the decorator - re-raise particular error for global handling in middlewares.
+
+    :param function: some async function
+    :type function: Callable
+
+    :keyword except_error: error type, that will be handled (might be passed tuple of Exception-s)
+    :type except_error: Union[Type[Exception], tuple[Type[Exception]]]
+    :keyword raise_error: error type, that will be raised [if `except_error` was handled]
+    :type raise_error: Type[Exception]
+
+    :return: function result
+    :rtype: Any
+
+    :raises [in inner] `raise_error`: raised if the `except_error` was handled
+    """
+
+    if function is None:
+        return lambda function: handle_local_error(function, except_error=except_error, raise_error=raise_error)
+
+    async def inner(*args, **kwargs) -> Any:
+        """
+        Handle function work [and re-raise error if expected error was caught].
+
+        :return: function result
+        :rtype: Any
+
+        :raises `raise_error`: raised if the `except_error` was handled
+        """
+
+        try:
+            function_result = await function(*args, **kwargs)
+        except except_error as caught_error:
+            raise raise_error from caught_error
+        else:
+            return function_result
 
     return inner
