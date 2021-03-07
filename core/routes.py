@@ -3,22 +3,17 @@ Contains route-functions that setup routes in the app.
 
 .. function:: setup_routes(app: aiohttp.web.Application) -> None
     Setup routes in the app
-.. function:: setup_static_routes(app: aiohttp.web.Application) -> None:
+.. function:: setup_static_routes(app: aiohttp.web.Application) -> None
     Setup static route in the app
 
 .. const:: PROJECT_ROOT
     Contains path to project directory
 """
 
-import pathlib
-
 import aiohttp.web
 
 from .views import views
-
-
-# `core` package
-PROJECT_ROOT = pathlib.Path(__file__).parent
+from .settings import STATIC_DIR
 
 
 def setup_routes(app: aiohttp.web.Application) -> None:
@@ -94,44 +89,54 @@ def setup_routes(app: aiohttp.web.Application) -> None:
     app.router.add_get('/user/logout/', views.UserLogout, name='user-logout')
     # # settings
     # # # # GET
-    # app.router.add_get('/my/settings/edit', views.UserSettingsEditingForm, name='user-settings')
-    # # # # POST
-    # app.router.add_post('/user/settings/edit/', views.UserSettingsEditing)
+    app.router.add_get('/my/settings/edit/', views.UserSettingsEditing, name='user-settings-edit')
+    app.router.add_get(
+        '/my/settings/edit/login/', views.UserSettingsEditingLoginForm, name='user-settings-edit-login'
+    )
+    app.router.add_get(
+        '/my/settings/edit/password/', views.UserSettingsEditingPasswordForm, name='user-settings-edit-password'
+    )
+    app.router.add_get(
+        '/my/settings/edit/info/', views.UserSettingsEditingInfoForm, name='user-settings-edit-info'
+    )
+    app.router.add_get(
+        '/my/settings/edit/image/', views.UserSettingsEditingImageForm, name='user-settings-edit-image'
+    )
+    # # # POST
+    app.router.add_post('/user/settings/edit/login/', views.UserSettingsEditingLogin)
+    app.router.add_post('/user/settings/edit/password/', views.UserSettingsEditingPassword)
+    app.router.add_post('/user/settings/edit/info/', views.UserSettingsEditingInfo)
+    app.router.add_post('/user/settings/edit/image/', views.UserSettingsEditingImage)
 
     # posts < --- > user partition
     # # user (self) posts
     # # # GET
     app.router.add_get('/my/posts/', views.UserPosts, name='user-posts')
 
-    # # user < --- > user partition
-    # # # user page
-    # # # # GET
-    # app.router.add_get(r'/thinker/{id:\d+}/', views.UserPosts)
-    #
-    # # grant user partition
-    # # # admin
-    # # # - delete user
-    # # # # GET
-    # app.router.add_get('/admin/delete/user/', views.UserPosts)
-    # # # # POST
-    # app.router.add_post('/admin/delete/user/', views.UserPosts)
-    # # # - set moderator
-    # # # # GET
-    # app.router.add_get('/admin/set/moderator/', views.UserPosts)
-    # # # # POST
-    # app.router.add_post('/admin/set/moderator/', views.UserPosts)
-    # # # - unset moderator
-    # # # # GET
-    # app.router.add_get('/admin/unset/moderator/', views.UserPosts)
-    # # # # POST
-    # app.router.add_post('/admin/unset/moderator/', views.UserPosts)
-    #
-    # # # moderator
-    # # # - moderate posts
-    # # # # GET
-    # app.router.add_get(r'/moderator/posts/{id:\d+}/', views.UserPosts)
-    # # # # POST
-    # app.router.add_post(r'/moderator/posts/delete/', views.UserPosts)
+    # thinker partition
+    # # thinker page
+    # # # GET
+    app.router.add_get(r'/thinker/{id:\d+}/', views.Thinker, name='thinker-id')
+
+    # grant user partition
+    # # admin
+    # # - set moderator
+    # # # GET
+    app.router.add_get('/admin/set/moderator/', views.SettingModeratorByAdmin, name='admin-set-moderator')
+    # # # POST
+    app.router.add_post('/admin/set/moderator/', views.SettingModeratorByAdmin)
+    # # - unset moderator
+    # # # GET
+    app.router.add_get('/admin/unset/moderator/', views.UnsettingModeratorByAdmin, name='admin-unset-moderator')
+    # # # POST
+    app.router.add_post('/admin/unset/moderator/', views.UnsettingModeratorByAdmin)
+
+    # # moderator
+    # # - moderate posts
+    # # # GET
+    app.router.add_get(r'/moderator/posts/delete/', views.PostModerating, name='moderator-posts-delete')
+    # # # POST
+    app.router.add_post(r'/moderator/posts/delete/', views.PostModerating)
 
     # - - - - - - - - - - - - -
     # static                   |
@@ -149,8 +154,13 @@ def setup_static_routes(app: aiohttp.web.Application) -> None:
     :rtype: None
     """
 
+    static_root_url = '/static/'
+
+    # for jinja `static` function
+    app['static_root_url'] = static_root_url
+
     app.router.add_static(
-        '/static/',
-        path=PROJECT_ROOT / 'static',
+        static_root_url,
+        path=STATIC_DIR,
         name='static'
     )
