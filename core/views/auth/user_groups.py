@@ -17,6 +17,17 @@ Hierarchy of grants:
     UserCreation with moderator grant
 .. class:: Admin(Moderator)
     UserCreation with admin grant
+
+.. const:: VISITOR_USER_GROUP_ID
+    Special id for user group
+.. const:: USER_USER_GROUP_ID
+    Special id for user group
+.. const:: MODERATOR_USER_GROUP_ID
+    Special id for user group
+.. const:: ADMIN_USER_GROUP_ID
+    Special id for user group
+..const:: user_groups_mapping
+    Mapping that contains pairs - int id key and user group class
 """
 
 import abc
@@ -40,3 +51,17 @@ class Moderator(User):
 
 class Admin(Moderator):
     """ UserCreation with admin grant """
+
+
+# CLASSES ARE NOT SERIALIZABLE [FOR JSON] -> IN THE SESSION SAVE ID OF THE USER GROUP CLASS
+VISITOR_USER_GROUP_ID = 1
+USER_USER_GROUP_ID = 2
+MODERATOR_USER_GROUP_ID = 3
+ADMIN_USER_GROUP_ID = 4
+
+user_groups_mapping = {
+    VISITOR_USER_GROUP_ID: Visitor,
+    USER_USER_GROUP_ID: User,
+    MODERATOR_USER_GROUP_ID: Moderator,
+    ADMIN_USER_GROUP_ID: Admin
+}

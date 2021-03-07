@@ -11,7 +11,7 @@ Contains implementing of pagination.
 from typing import Union
 
 
-DEFAULT_PAGE_NUMBERS_SEPARATOR = '...'
+from ..settings import DEFAULT_PAGE_NUMBERS_SEPARATOR
 
 
 class Pagination:

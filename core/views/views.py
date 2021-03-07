@@ -1,25 +1,115 @@
 """
-Contains view-functions that return html page by particular url-route.
+Contains views.
 
-
-Functions:
-        ...
-    --------------------------------------------------------------------------------------------------------------------
+.. class:: Index(aiohttp.web.View)
+    VIEW CLASS
+.. class:: Contacts(aiohttp.web.View)
+    VIEW CLASS
+.. class:: Posts(aiohttp.web.View)
+    VIEW CLASS
+.. class:: Post(aiohttp.web.View)
+    VIEW CLASS
+.. class:: RandomPost(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostCreation(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostEditingForm(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostEditing(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostDeleting(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostRubrics(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostRubricCreation(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostRubricEditingForm(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostRubricEditing(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostRubricDeleting(aiohttp.web.View)
+    VIEW CLASS
+.. class:: Notes(aiohttp.web.View)
+    VIEW CLASS
+.. class:: Note(aiohttp.web.View)
+    VIEW CLASS
+.. class:: NoteCreation(aiohttp.web.View)
+    VIEW CLASS
+.. class:: NoteEditingForm(aiohttp.web.View)
+    VIEW CLASS
+.. class:: NoteEditing(aiohttp.web.View)
+    VIEW CLASS
+.. class:: NoteDeleting(aiohttp.web.View)
+    VIEW CLASS
+.. class:: NoteRubrics(aiohttp.web.View)
+    VIEW CLASS
+.. class:: NoteRubricCreation(aiohttp.web.View)
+    VIEW CLASS
+.. class:: NoteRubricEditingForm(aiohttp.web.View)
+    VIEW CLASS
+.. class:: NoteRubricEditing(aiohttp.web.View)
+    VIEW CLASS
+.. class:: NoteRubricDeleting(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserRegistration(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserAuthorization(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserLogout(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserSettingsEditing(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserSettingsEditingLoginForm(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserSettingsEditingLogin(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserSettingsEditingPasswordForm(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserSettingsEditingPassword(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserSettingsEditingInfoForm(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserSettingsEditingInfo(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserSettingsEditingImageForm(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserSettingsEditingImage(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UserPosts(aiohttp.web.View)
+    VIEW CLASS
+.. class:: Thinker(aiohttp.web.View)
+    VIEW CLASS
+.. class:: SettingModeratorByAdmin(aiohttp.web.View)
+    VIEW CLASS
+.. class:: UnsettingModeratorByAdmin(aiohttp.web.View)
+    VIEW CLASS
+.. class:: PostModerating(aiohttp.web.View)
+    VIEW CLASS
 """
 
 from typing import Union
 
 import aiohttp.web
 import aiohttp_jinja2
-import aiohttp_session
 import pydantic
 
 from . import (
+    InvalidFormDataError,
     auth,
     pagination,
-    helpers
+    helpers,
+    utils
 )
+from .. import security
 from ..database import db, validators
+from ..settings import USER_IMAGES_DIR
+
+
+# USER_IMAGES_DIR = STATIC_DIR / USER_IMAGES_DIRECTORY_NAME
+
+
+# aiohttp_jinja use `/` separator on paths joining, so I continue use `/`
+# on file path argument for rendering
 
 
 # main partition
@@ -28,8 +118,8 @@ from ..database import db, validators
 class Index(aiohttp.web.View):
     """ View for '/' url """
 
-    @aiohttp_jinja2.template('index.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('main/index.html')
+    @helpers.put_session_data_in_view_result
     async def get(self) -> dict:
         """ Return index page """
         return {}
@@ -38,8 +128,8 @@ class Index(aiohttp.web.View):
 class Contacts(aiohttp.web.View):
     """ View for '/contacts/' url """
 
-    @aiohttp_jinja2.template('contacts.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('main/contacts.html')
+    @helpers.put_session_data_in_view_result
     async def get(self) -> dict:
         """ Return contacts page """
         return {}
@@ -52,8 +142,8 @@ class Contacts(aiohttp.web.View):
 class Posts(aiohttp.web.View):
     """ View for '/posts/' url """
 
-    @aiohttp_jinja2.template('posts.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('posts/posts.html')
+    @helpers.put_session_data_in_view_result
     async def get(self) -> dict:
         """
         Return page with posts.
@@ -85,8 +175,8 @@ class Posts(aiohttp.web.View):
 class Post(aiohttp.web.View):
     """ View for '/posts/<id: int>/ url """
 
-    @aiohttp_jinja2.template('post.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('posts/post.html')
+    @helpers.put_session_data_in_view_result
     async def get(self) -> dict:
         """ Return page with 1 particular post """
         post_id = helpers.get_id_param_from_url(self.request)
@@ -104,8 +194,8 @@ class Post(aiohttp.web.View):
 class RandomPost(aiohttp.web.View):
     """ View for '/posts/random/' url """
 
-    @aiohttp_jinja2.template('post.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('posts/post.html')
+    @helpers.put_session_data_in_view_result
     async def get(self) -> dict:
         """ Return page with random post """
         async with self.request.app['db'].acquire() as connection:
@@ -121,8 +211,8 @@ class RandomPost(aiohttp.web.View):
 class PostCreation(aiohttp.web.View):
     """ View for '/posts/create/' url """
 
-    @aiohttp_jinja2.template('post_creation.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('posts/post_creation.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
         """ Return page with post creation form """
@@ -140,8 +230,7 @@ class PostCreation(aiohttp.web.View):
         """ Handle post creation form """
         data = await self.request.post()
 
-        session = await aiohttp_session.get_session(self.request)
-        user_id = session['user']['id']
+        user_id = await helpers.get_user_id_from_session(self.request)
 
         try:
             post = validators.PostCreation(user_id=user_id, **data)
@@ -159,8 +248,8 @@ class PostCreation(aiohttp.web.View):
 class PostEditingForm(aiohttp.web.View):
     """ View for '/posts/<id: int>/edit/' url """
 
-    @aiohttp_jinja2.template('post_editing.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('posts/post_editing.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
         """ Return filled post form for editing  """
@@ -228,8 +317,8 @@ class PostDeleting(aiohttp.web.View):
 class PostRubrics(aiohttp.web.View):
     """ View for '/posts/rubrics/' url """
 
-    @aiohttp_jinja2.template('post_rubrics.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('post_rubrics/post_rubrics.html')
+    @helpers.put_session_data_in_view_result
     async def get(self) -> dict:
         """ Return page with list of post rubrics """
         async with self.request.app['db'].acquire() as connection:
@@ -245,8 +334,8 @@ class PostRubrics(aiohttp.web.View):
 class PostRubricCreation(aiohttp.web.View):
     """ View for '/posts/rubrics/create/' url """
 
-    @aiohttp_jinja2.template('post_rubric_creation.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('post_rubrics/post_rubric_creation.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
     @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
     async def get(self) -> dict:
         """ Return page with post rubric creation form """
@@ -254,14 +343,16 @@ class PostRubricCreation(aiohttp.web.View):
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
     async def post(self):
-        """ View for '/posts/rubrics/create/' url {POST} """
+        """ View for '/posts/rubrics/create/' url """
         data = await self.request.post()
 
+        user_id = await helpers.get_user_id_from_session(self.request)
+
         try:
-            post_rubric = validators.PostRubricCreation(**data)
+            post_rubric = validators.PostRubricCreation(user_id=user_id, **data)
         except pydantic.ValidationError as error:
             return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
-                self.request, error, self.request.app.router['posts-rubrics-create'].url_for()
+                self.request, error, redirect_route_name='posts-rubrics-create'
             )
         else:
             async with self.request.app['db'].acquire() as connection:
@@ -273,8 +364,8 @@ class PostRubricCreation(aiohttp.web.View):
 class PostRubricEditingForm(aiohttp.web.View):
     """ View class for '/posts/rubrics/<id: int>/edit/' url """
 
-    @aiohttp_jinja2.template('post_rubric_editing.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('post_rubrics/post_rubric_editing.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
     @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
     async def get(self) -> dict:
         """ Return page with filled post rubric editing form """
@@ -304,7 +395,7 @@ class PostRubricEditing(aiohttp.web.View):
             post_rubric = validators.PostRubricEditing(**data)
         except pydantic.ValidationError as error:
             return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
-                self.request, error, self.request.app.router['posts-rubrics-create'].url_for()
+                self.request, error, redirect_route_name='posts-rubrics-edit', id=post_rubric_id
             )
         else:
             async with self.request.app['db'].acquire() as connection:
@@ -338,8 +429,8 @@ class PostRubricDeleting(aiohttp.web.View):
 class Notes(aiohttp.web.View):
     """ View for 'notes' url """
 
-    @aiohttp_jinja2.template('notes.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('notes/notes.html')
+    @helpers.put_session_data_in_view_result
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
         """
@@ -354,8 +445,7 @@ class Notes(aiohttp.web.View):
         url_params = self.request.rel_url.query
         validated_url_params = validators.NoteUrlParams(**url_params)
 
-        session = await aiohttp_session.get_session(self.request)
-        user_id = session['user']['id']
+        user_id = await helpers.get_user_id_from_session(self.request)
 
         async with self.request.app['db'].acquire() as connection:
             notes = await db.fetch_all_notes(connection, user_id, validated_url_params)
@@ -374,14 +464,15 @@ class Notes(aiohttp.web.View):
 
 class Note(aiohttp.web.View):
     """ View for '/notes/<id: int>/' url """
-    @aiohttp_jinja2.template('post.html')
-    @helpers.put_additional_data_in_view_result
+
+    @aiohttp_jinja2.template('notes/note.html')
+    @helpers.put_session_data_in_view_result
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
         """ Return page with particular note """
         note_id = helpers.get_id_param_from_url(self.request)
 
-        note = await auth.authentication_policy.authenticate_note_owner(self.request, note_id)
+        _, note = await auth.authentication_policy.authenticate_note_owner(self.request, note_id)
 
         data = {
             'note': note
@@ -393,13 +484,12 @@ class Note(aiohttp.web.View):
 class NoteCreation(aiohttp.web.View):
     """ View for '/notes/create/' url """
 
-    @aiohttp_jinja2.template('note_creation.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('notes/note_creation.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
         """ Return page with note creation form """
-        session = await aiohttp_session.get_session(self.request)
-        user_id = session['user']['id']
+        user_id = await helpers.get_user_id_from_session(self.request)
 
         async with self.request.app['db'].acquire() as connection:
             note_rubrics = await db.fetch_all_note_rubrics(connection, user_id)
@@ -415,14 +505,13 @@ class NoteCreation(aiohttp.web.View):
         """ Handle note creation form """
         data = await self.request.post()
 
-        session = await aiohttp_session.get_session(self.request)
-        user_id = session['user']['id']
+        user_id = await helpers.get_user_id_from_session(self.request)
 
         try:
             note = validators.NoteCreation(user_id=user_id, **data)
         except pydantic.ValidationError as error:
             return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
-                self.request, error, self.request.app.router['notes-create'].url_for()
+                self.request, error, redirect_route_name='notes-create'
             )
         else:
             async with self.request.app['db'].acquire() as connection:
@@ -434,17 +523,14 @@ class NoteCreation(aiohttp.web.View):
 class NoteEditingForm(aiohttp.web.View):
     """ View for '/notes/<id: int>/edit/' url """
 
-    @aiohttp_jinja2.template('post_creation_form.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('notes/note_editing.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
-        """ View for '/notes/{id}/edit/' url {POST} """
+        """ View for '/notes/{id}/edit/' url """
         note_id = helpers.get_id_param_from_url(self.request)
 
-        note = await auth.authentication_policy.authenticate_note_owner(self.request, note_id)
-
-        session = await aiohttp_session.get_session(self.request)
-        user_id = session['user']['id']
+        user_id, note = await auth.authentication_policy.authenticate_note_owner(self.request, note_id)
 
         async with self.request.app['db'].acquire() as connection:
             note_rubrics = await db.fetch_all_note_rubrics(connection, user_id)
@@ -479,7 +565,7 @@ class NoteEditing(aiohttp.web.View):
             async with self.request.app['db'].acquire() as connection:
                 await db.update_note(connection, note_id, note)
 
-            return helpers.redirect_by_route_name(self.request, 'notes-id')
+            return helpers.redirect_by_route_name(self.request, 'notes-id', id=note_id)
 
 
 class NoteDeleting(aiohttp.web.View):
@@ -492,12 +578,12 @@ class NoteDeleting(aiohttp.web.View):
 
         note_id = helpers.get_id_param_from_form_data(data)
 
-        await auth.authentication_policy.authenticate_post_owner(self.request, note_id)
+        await auth.authentication_policy.authenticate_note_owner(self.request, note_id)
 
         async with self.request.app['db'].acquire() as connection:
-            await db.delete_post(connection, note_id)
+            await db.delete_note(connection, note_id)
 
-        return aiohttp.web.HTTPFound(self.request.app.router['notes'].url_for())
+        return helpers.redirect_by_route_name(self.request, 'notes')
 
 
 # # note rubrics
@@ -506,13 +592,12 @@ class NoteDeleting(aiohttp.web.View):
 class NoteRubrics(aiohttp.web.View):
     """ View for '/notes/rubrics/' url """
 
-    @aiohttp_jinja2.template('note_rubrics.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('note_rubrics/note_rubrics.html')
+    @helpers.put_session_data_in_view_result
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
         """ Return page with not rubrics """
-        session = await aiohttp_session.get_session(self.request)
-        user_id = session['user']['id']
+        user_id = await helpers.get_user_id_from_session(self.request)
 
         async with self.request.app['db'].acquire() as connection:
             rubrics = await db.fetch_all_note_rubrics(connection, user_id)
@@ -527,19 +612,19 @@ class NoteRubrics(aiohttp.web.View):
 class NoteRubricCreation(aiohttp.web.View):
     """ View for '/notes/rubrics/create/' url """
 
-    @aiohttp_jinja2.template('note_rubric_creation.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('note_rubrics/note_rubric_creation.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
         """ Return page with note rubric creation form """
         return {}
 
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def post(self):
         """ Handle note rubric creation form """
         data = await self.request.post()
 
-        session = await aiohttp_session.get_session(self.request)
-        user_id = session['user']['id']
+        user_id = await helpers.get_user_id_from_session(self.request)
 
         try:
             note_rubric = validators.NoteRubricCreation(user_id=user_id, **data)
@@ -551,20 +636,20 @@ class NoteRubricCreation(aiohttp.web.View):
             async with self.request.app['db'].acquire() as connection:
                 await db.insert_note_rubric(connection, note_rubric)
 
-            return helpers.redirect_by_route_name(self.request, 'note-rubrics')
+            return helpers.redirect_by_route_name(self.request, 'notes-rubrics')
 
 
 class NoteRubricEditingForm(aiohttp.web.View):
     """ View for '/notes/rubrics/<id: int>/edit/' url """
 
-    @aiohttp_jinja2.template('note_rubric_editing.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('note_rubrics/note_rubric_editing.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
         """ Return page with note rubric editing form """
         note_rubric_id = helpers.get_id_param_from_url(self.request)
 
-        note_rubric = await auth.authentication_policy.authenticate_note_rubric_owner(self.request, note_rubric_id)
+        _, note_rubric = await auth.authentication_policy.authenticate_note_rubric_owner(self.request, note_rubric_id)
 
         data = {
             'note_rubric': note_rubric
@@ -625,12 +710,14 @@ class NoteRubricDeleting(aiohttp.web.View):
 class UserRegistration(aiohttp.web.View):
     """ View for '/user/register/ url """
 
-    @aiohttp_jinja2.template('sign_up.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('user/sign_up.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Visitor)
     async def get(self) -> dict:
         """ Return page with user registration form """
         return {}
 
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Visitor)
     async def post(self) -> Union[aiohttp.web.HTTPSeeOther, aiohttp.web.HTTPFound]:
         """ Handle user registration form """
         data = await self.request.post()
@@ -661,12 +748,14 @@ class UserRegistration(aiohttp.web.View):
 class UserAuthorization(aiohttp.web.View):
     """ View for '/user/login/ url """
 
-    @aiohttp_jinja2.template('sign_in.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('user/sign_in.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Visitor)
     async def get(self) -> dict:
         """ Return page with user authorization form """
         return {}
 
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Visitor)
     async def post(self):
         """ Handle user authorization form """
         data = await self.request.post()
@@ -695,6 +784,7 @@ class UserAuthorization(aiohttp.web.View):
 class UserLogout(aiohttp.web.View):
     """ View for '/user/logout/' url """
 
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> aiohttp.web.HTTPFound:
         """ Logout user """
         await auth.authorization.logout_user(self.request)
@@ -702,16 +792,258 @@ class UserLogout(aiohttp.web.View):
         return helpers.redirect_by_route_name(self.request, 'index')
 
 
-# class UserSettingsEditing(aiohttp.web.View):
-#     """ View class for '/user/settings/edit/ url. Implement GET and POST requests. """
-#     # @aiohttp_jinja2.template('post_creation_form.html')
-#     async def get(self) -> dict:
-#         """ View for '/user/settings/edit/' url {GET} """
-#         return {}
-#
-#     async def post(self):
-#         """ View for '/user/settings/edit/' url {POST} """
-#         return {}
+# # settings
+
+
+class UserSettingsEditing(aiohttp.web.View):
+    """ View for '/my/settings/edit/' url """
+
+    @aiohttp_jinja2.template('user/user_settings_editing.html')
+    @helpers.put_session_data_in_view_result
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
+    async def get(self) -> dict:
+        """ Return page with links on more narrow editing forms """
+        user_id = await helpers.get_user_id_from_session(self.request)
+
+        async with self.request.app['db'].acquire() as connection:
+            user = await db.fetch_one_user(connection, user_id=user_id)
+
+        data = {
+            'user': user
+        }
+
+        return data
+
+
+class UserSettingsEditingLoginForm(aiohttp.web.View):
+    """ View for '/my/settings/edit/login/' url """
+
+    @aiohttp_jinja2.template('user/user_settings_editing_login.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
+    async def get(self) -> dict:
+        """ Return page with links on more narrow editing forms """
+        return {}
+
+
+class UserSettingsEditingLogin(aiohttp.web.View):
+    """ View for '/my/settings/edit/login/' url """
+
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
+    @utils.handle_local_error(except_error=KeyError, raise_error=InvalidFormDataError)
+    async def post(self):
+        """ Handle user login editing form """
+        data = await self.request.post()
+
+        password_for_verifying = data['password']
+
+        try:
+            user = await auth.authentication_policy.authenticate_user_by_password(self.request, password_for_verifying)
+        except auth.AuthenticationError as error:
+            return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                self.request, error, redirect_route_name='user-settings-edit-login'
+            )
+        else:
+            try:
+                new_login = validators.UserSettingsEditingLogin(**data).new_login
+            except pydantic.ValidationError as error:
+                return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                    self.request, error, redirect_route_name='user-settings-edit-login'
+                )
+            else:
+                current_login = user['login']
+
+                if new_login == current_login:
+                    error = 'it seems no sense to change login with no difference with current'
+                    return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                        self.request, error, redirect_route_name='user-settings-edit-login'
+                    )
+
+                async with self.request.app['db'].acquire() as connection:
+                    login_availability = await auth.authorization.check_login_for_availability(connection, new_login)
+
+                if login_availability:
+                    user_id = user['id']
+
+                    await db.update_user_login(connection, user_id, new_login)
+
+                    return helpers.redirect_by_route_name(self.request, 'thinker-id', id=user_id)
+                else:
+                    error = 'Login is busy. Choose another, please!'
+                    return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                        self.request, error, redirect_route_name='user-settings-edit-login'
+                    )
+
+
+class UserSettingsEditingPasswordForm(aiohttp.web.View):
+    """ View for '/my/settings/edit/password' url """
+
+    @aiohttp_jinja2.template('user/user_settings_editing_password.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
+    async def get(self) -> dict:
+        """ Return page with user password editing form """
+        return {}
+
+
+class UserSettingsEditingPassword(aiohttp.web.View):
+    """ View for '/user/settings/edit/password/ url """
+
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
+    @utils.handle_local_error(except_error=KeyError, raise_error=InvalidFormDataError)
+    async def post(self):
+        """ Handle user password editing form """
+        data = await self.request.post()
+
+        password_for_verifying = data['password']
+
+        try:
+            user = await auth.authentication_policy.authenticate_user_by_password(self.request, password_for_verifying)
+        except auth.AuthenticationError as error:
+            return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                self.request, error, redirect_route_name='user-settings-edit-password'
+            )
+        else:
+            try:
+                new_password = validators.UserSettingsEditingPassword(**data).new_password
+            except pydantic.ValidationError as error:
+                return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                    self.request, error, redirect_route_name='user-settings-edit-password'
+                )
+            else:
+                user_id = user['id']
+                new_hashed_password = security.hash_password(new_password)
+
+                async with self.request.app['db'].acquire() as connection:
+                    await db.update_user_password(connection, user_id, new_hashed_password)
+
+                return helpers.redirect_by_route_name(self.request, 'thinker-id', id=user_id)
+
+
+class UserSettingsEditingInfoForm(aiohttp.web.View):
+    """ View for '/my/settings/edit/info/' url """
+
+    @aiohttp_jinja2.template('user/user_settings_editing_info.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
+    async def get(self) -> dict:
+        """ Return page with links on more narrow editing forms """
+        return {}
+
+
+class UserSettingsEditingInfo(aiohttp.web.View):
+    """ View for '/user/settings/edit/info/ url """
+
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
+    @utils.handle_local_error(except_error=KeyError, raise_error=InvalidFormDataError)
+    async def post(self):
+        """ Handle user info settings editing form """
+        data = await self.request.post()
+
+        password_for_verifying = data['password']
+
+        try:
+            user = await auth.authentication_policy.authenticate_user_by_password(self.request, password_for_verifying)
+        except auth.AuthenticationError as error:
+            return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                self.request, error, redirect_route_name='user-settings-edit-info'
+            )
+        else:
+            try:
+                new_info = validators.UserSettingsEditingInfo(**data)
+            except pydantic.ValidationError as error:
+                return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                    self.request, error, redirect_route_name='user-settings-edit-info'
+                )
+            else:
+                user_id = user['id']
+
+                async with self.request.app['db'].acquire() as connection:
+                    await db.update_user_info(connection, user_id, new_info)
+
+                return helpers.redirect_by_route_name(self.request, 'thinker-id', id=user_id)
+
+
+class UserSettingsEditingImageForm(aiohttp.web.View):
+    """ View for '/my/settings/edit/image/' url """
+
+    @aiohttp_jinja2.template('user/user_settings_editing_image.html')
+    @helpers.put_session_data_in_view_result(put_alert_message=True)
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
+    async def get(self) -> dict:
+        """ Return page with user image editing form """
+        user_id = await helpers.get_user_id_from_session(self.request)
+
+        async with self.request.app['db'].acquire() as connection:
+            user = await db.fetch_one_user(connection, user_id=user_id)
+
+        data = {
+            'user': user
+        }
+
+        return data
+
+
+class UserSettingsEditingImage(aiohttp.web.View):
+    """ View for '/user/settings/edit/image/ url """
+
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
+    @utils.handle_local_error(except_error=AssertionError, raise_error=InvalidFormDataError)
+    async def post(self):
+        """ Handle user image editing form """
+        reader = await self.request.multipart()
+
+        password_field = await reader.next()
+        assert password_field.name == 'password'
+        password_for_verifying = await password_field.text()
+
+        try:
+            user = await auth.authentication_policy.authenticate_user_by_password(self.request, password_for_verifying)
+        except auth.AuthenticationError as error:
+            return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                self.request, error, redirect_route_name='user-settings-edit-image'
+            )
+        else:
+            user_id = user['id']
+
+            # absolute image path - for saving or deleting on hard drive
+            image_name = f'{user_id}.png'
+            image_path_for_saving_on_hard_drive = USER_IMAGES_DIR / image_name
+
+            image_field = await reader.next()
+            assert image_field.name == 'image'
+            image_field_filename = image_field.filename
+            # assert that field non empty by filename presence
+            is_image_uploaded = bool(image_field_filename)
+
+            if is_image_uploaded:
+                try:
+                    _ = validators.FileIsImage(filename=image_field_filename)
+                except pydantic.ValidationError as error:
+                    return await helpers.redirect_back_to_the_form_with_alert_message_in_session(
+                        self.request, error, redirect_route_name='user-settings-edit-image'
+                    )
+                else:
+                    # relative image path - for saving static url in db
+                    image_path_for_saving_static_url_in_db = image_path_for_saving_on_hard_drive.relative_to(
+                        # ../static/ | images/user_images/image_name
+                        image_path_for_saving_on_hard_drive.parent.parent.parent
+                    ).as_posix()
+
+                    await helpers.save_user_image(image_path_for_saving_on_hard_drive, image_field)
+
+                    async with self.request.app['db'].acquire() as connection:
+                        await db.update_user_image_path(connection, user_id, image_path_for_saving_static_url_in_db)
+
+            is_set_default_image_field = await reader.next()
+            if is_set_default_image_field:
+                if not is_image_uploaded:
+                    await helpers.delete_user_image(image_path_for_saving_on_hard_drive)
+
+                    async with self.request.app['db'].acquire() as connection:
+                        await db.update_user_image_path(connection, user_id, None)
+
+            return helpers.redirect_by_route_name(self.request, 'thinker-id', id=user_id)
 
 
 # posts < --- > user partition
@@ -723,15 +1055,15 @@ class UserLogout(aiohttp.web.View):
 class UserPosts(aiohttp.web.View):
     """ View for '/my/posts/' url """
 
-    @aiohttp_jinja2.template('user_posts.html')
-    @helpers.put_additional_data_in_view_result
+    @aiohttp_jinja2.template('posts/user_posts.html')
+    @helpers.put_session_data_in_view_result
+    @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     async def get(self) -> dict:
         """ Return page with user posts """
         url_params = self.request.rel_url.query
         validated_url_params = validators.PostUrlParams(**url_params)
 
-        session = await aiohttp_session.get_session(self.request)
-        user_id = session['user']['id']
+        user_id = await helpers.get_user_id_from_session(self.request)
 
         async with self.request.app['db'].acquire() as connection:
             posts = await db.fetch_all_posts(connection, validated_url_params, user_id=user_id)
@@ -747,3 +1079,122 @@ class UserPosts(aiohttp.web.View):
         }
 
         return data
+
+
+# thinker partition
+
+
+# # thinker page
+
+
+class Thinker(aiohttp.web.View):
+    """ View for '/thinker/<id: int>/' url """
+
+    @aiohttp_jinja2.template('user/user_page.html')
+    @helpers.put_session_data_in_view_result
+    async def get(self):
+        """ Return page with thinker info """
+        user_id = helpers.get_id_param_from_url(self.request)
+
+        async with self.request.app['db'].acquire() as connection:
+            user = await db.fetch_one_user(connection, user_id=user_id)
+
+        data = {
+            'user': user
+        }
+
+        return data
+
+
+# grant user partition
+
+
+# # admin
+
+
+# # - set moderator
+
+
+class SettingModeratorByAdmin(aiohttp.web.View):
+    """ View for '/admin/set/moderator/' url """
+
+    @aiohttp_jinja2.template('admin/moderator_setting.html')
+    @helpers.put_session_data_in_view_result
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
+    async def get(self) -> dict:
+        """ Return page with setting moderator form """
+        return {}
+
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
+    async def post(self):
+        """ Handle setting moderator form """
+        data = await self.request.post()
+
+        user_id = helpers.get_id_param_from_form_data(data)
+
+        async with self.request.app['db'].acquire() as connection:
+            await db.add_user_in_moderators(connection, user_id)
+
+        return helpers.redirect_by_route_name(self.request, 'admin-unset-moderator')
+
+
+# # - unset moderator
+
+
+class UnsettingModeratorByAdmin(aiohttp.web.View):
+    """ View for '/admin/unset/moderator/' url """
+
+    @aiohttp_jinja2.template('admin/moderator_unsetting.html')
+    @helpers.put_session_data_in_view_result
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
+    async def get(self) -> dict:
+        """ Return page with unsetting moderator form """
+        async with self.request.app['db'].acquire() as connection:
+            moderators = await db.fetch_all_moderators(connection)
+
+        data = {
+            'moderators': moderators
+        }
+
+        return data
+
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
+    async def post(self):
+        """ Handle unsetting moderator form """
+        data = await self.request.post()
+
+        user_id = helpers.get_id_param_from_form_data(data)
+
+        async with self.request.app['db'].acquire() as connection:
+            await db.delete_user_from_moderators(connection, user_id)
+
+        return helpers.redirect_by_route_name(self.request, 'admin-unset-moderator')
+
+
+# # moderator
+
+
+# # - moderate posts
+
+
+class PostModerating(aiohttp.web.View):
+    """ View for '/moderator/posts/delete/' url """
+
+    @aiohttp_jinja2.template('moderator/post_deleting.html')
+    @helpers.put_session_data_in_view_result
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Moderator)
+    async def get(self):
+        """ Return form for post moderating [deleting] """
+        return {}
+
+    @auth.session.user_group_access_required(user_group=auth.user_groups.Moderator)
+    async def post(self):
+        """ Handle post moderating form [deleting] """
+        data = await self.request.post()
+
+        post_id = helpers.get_id_param_from_form_data(data)
+
+        async with self.request.app['db'].acquire() as connection:
+            await db.delete_post(connection, post_id)
+
+        return helpers.redirect_by_route_name(self.request, 'posts')

@@ -7,6 +7,8 @@ Session structure:
             # db data
             'id'            : int
             'login'         : str
+            'about_me'      : str
+            'image_path'    : str
             'is_admin'      : int(0,1)
             'is_moderator'  : int(0,1)
             # created on authorization
@@ -21,7 +23,7 @@ Session structure:
 
 .. function:: get_alert_message_from_session(
         request: Optional[aiohttp.web.Request], session: Optional[aiohttp_session.Session] = None ) -> str
-    Return session alert message
+    Return session alert message (also delete this message - so, it will not be repeated)
 .. function:: put_alert_message_in_session(
         request: aiohttp.web.Request, alert_message: str, session: aiohttp_session.Session = None) -> None
     Put alert message in the session
@@ -59,10 +61,7 @@ def user_group_access_required(handler: Callable = None, *args, user_group: Type
     """
 
     if handler is None:
-        return lambda handler: user_group_access_required(
-            handler=handler,
-            user_group=user_group
-        )
+        return lambda handler: user_group_access_required(handler, user_group=user_group)
 
     @wraps(handler)
     @utils.view_decorator
@@ -84,21 +83,22 @@ def user_group_access_required(handler: Callable = None, *args, user_group: Type
         """
 
         session = await aiohttp_session.get_session(request)
-        session_user_group = session.get('user', {}).get('group')
+        session_user_group_id = session.get('user', {}).get('group_id')
+        session_user_group = user_groups.user_groups_mapping[session_user_group_id] if session_user_group_id else None
 
         if user_group == user_groups.Visitor:
-            if user_group is not None:
+            if session_user_group is not None:
                 return helpers.redirect_by_route_name(request, 'index')
         else:
             if session_user_group is None:
                 raise aiohttp.web.HTTPUnauthorized
             else:
-                if issubclass(session_user_group, user_group):
-                    handler_result = await handler(handler_argument)
-
-                    return handler_result
-                else:
+                if not issubclass(session_user_group, user_group):
                     raise aiohttp.web.HTTPForbidden
+
+        handler_result = await handler(handler_argument)
+
+        return handler_result
 
     return inner
 

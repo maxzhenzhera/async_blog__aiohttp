@@ -1,27 +1,34 @@
 """
 Contains functions that help handle and finalize view result.
 
-.. decorator:: put_additional_data_in_view_result(
-        handler: Callable = None, *args, put_session: bool = True, put_router: bool = True) -> Callable
-    put in handler result additional data (router, session data, alert message)
+.. decorator:: put_session_data_in_view_result(handler: Callable = None, *args, put_alert_message: bool = False
+        ) -> Callable:
+    Put in handler result additional data (session data, alert message)
 
 .. function:: redirect_by_url(url: Union[str, yarl.URL], *args, is_safe: bool = False
         ) -> Union[aiohttp.web.HTTPFound, aiohttp.web.HTTPSeeOther]
-    Return redirect object by url
+    Redirect by url
 .. function:: redirect_by_route_name(request: aiohttp.web.Request, route_name: str, *args, is_safe: bool = False,
         **kwargs: Any) -> Union[aiohttp.web.HTTPFound, aiohttp.web.HTTPSeeOther]
-    Return redirect object by route name
+    Redirect by route name
 .. function:: redirect_back_to_the_form_with_alert_message_in_session(request: aiohttp.web.Request,
-        error: Union[pydantic.ValidationError, Exception], *args, redirect_url: Union[str, yarl.URL] = None,
+        error: Union[pydantic.ValidationError, Exception, str], *args, redirect_url: Union[str, yarl.URL] = None,
         redirect_route_name: str = None, **kwargs: Any) -> aiohttp.web.HTTPFound
-    Return redirect object back to the from page with alert message in session
+    Redirect on the page by passed param with alert message in the session
 .. function:: get_id_param_from_url(request: aiohttp.web.Request) -> int
-    Get int id param from url
+    Return id param from url
 .. function:: get_id_param_from_form_data(data: multidict.MultiDictProxy) -> int
-    Get int id param from form data
+    Return id param from form data
+.. function:: get_user_id_from_session(request: aiohttp.web.Request) -> int
+    Return uer id param from session
+.. function:: save_user_image(filepath: pathlib.Path, image_field: aiohttp.multipart.BodyPartReader) -> None
+    Save user image
+.. function:: delete_user_image(filepath: pathlib.Path) -> None
+    Delete user image
 """
 
 from functools import wraps
+import pathlib
 from typing import (
     Any,
     Callable,
@@ -41,56 +48,47 @@ from . import (
 from ..database import validators
 
 
-def put_additional_data_in_view_result(handler: Callable = None,
-                                       *args,
-                                       put_session: bool = True, put_router: bool = True
-                                       ) -> Callable:
+def put_session_data_in_view_result(handler: Callable = None, *args, put_alert_message: bool = False) -> Callable:
     """
-    Put in handler result additional data (session data, router).
+    Put in handler result session data.
 
     :param handler: view function
     :type handler: Callable
-    :keyword put_session: flag (put session in result?)
-    :type put_session: bool
-    :keyword put_router: flag (put router in result?)
-    :type put_router: bool
+    :keyword put_alert_message: with this flag alert message will be removed from session (will be shown only once)
+    :type put_alert_message: bool
 
     :return: inner function
     :rtype: Callable
     """
 
     if handler is None:
-        return lambda handler: put_additional_data_in_view_result(
-            handler=handler,
-            put_session=put_session,
-            put_router=put_router
-        )
+        return lambda handler: put_session_data_in_view_result(handler, put_alert_message=put_alert_message)
 
     @wraps(handler)
     @utils.view_decorator
     async def inner(handler_argument: Union[aiohttp.web.View, aiohttp.web.Request], request: aiohttp.web.Request
                     ) -> dict:
         """
-        Get additional data and put it in handler result.
+        Get session data and put it in handler result.
 
         :param handler_argument: argument that will be passed in view handler
         :type handler_argument: Union[aiohttp.web.View, aiohttp.web.Request]
         :param request: request (to get additional data (router, session))
         :type request: aiohttp.web.Request
 
-        :return: handler result with additional data
+        :return: handler result with session data
         :rtype: dict
         """
 
         handler_result: dict = await handler(handler_argument)
+
         session = await aiohttp_session.get_session(request)
 
-        if put_session:
-            handler_result['session'] = session
+        if put_alert_message:
+            alert_message = await auth.session.get_alert_message_from_session(None, session)
+            handler_result['message'] = alert_message
 
-        if put_router:
-            router = request.app.router
-            handler_result['router'] = router
+        handler_result['session'] = session
 
         return handler_result
 
@@ -143,7 +141,9 @@ def redirect_by_route_name(request: aiohttp.web.Request, route_name: str, *args,
 
 
 async def redirect_back_to_the_form_with_alert_message_in_session(request: aiohttp.web.Request,
-                                                                  error: Union[pydantic.ValidationError, Exception],
+                                                                  error: Union[
+                                                                      pydantic.ValidationError, Exception, str
+                                                                  ],
                                                                   *args,
                                                                   redirect_url: Union[str, yarl.URL] = None,
                                                                   redirect_route_name: str = None,
@@ -158,7 +158,7 @@ async def redirect_back_to_the_form_with_alert_message_in_session(request: aioht
     :param request: request
     :type request: aiohttp.web.Request
     :param error: error that raised during validation
-    :type error: Union[pydantic.ValidationError, Exception]
+    :type error: Union[pydantic.ValidationError, Exception, str]
     :keyword redirect_url: url
     :type redirect_url: Union[str, yarl.URL]
     :keyword redirect_route_name: route name
@@ -226,3 +226,57 @@ def get_id_param_from_form_data(data: multidict.MultiDictProxy) -> int:
         raise aiohttp.web.HTTPBadRequest(reason='the form data do not have expected params')
     else:
         return id_
+
+
+async def get_user_id_from_session(request: aiohttp.web.Request) -> int:
+    """
+    Return user-id from session.
+
+    :param request: request
+    :type request: aiohttp.web.Request
+
+    :return: user-id
+    :rtype: int
+    """
+
+    session = await aiohttp_session.get_session(request)
+    user_id = session['user']['id']
+
+    return user_id
+
+
+async def save_user_image(filepath: pathlib.Path, image_field: aiohttp.multipart.BodyPartReader) -> None:
+    """
+    Save user image.
+
+    :param filepath: absolute path of the image
+    :type filepath: pathlib.Path
+    :param image_field: image field (got from mupltipart reader)
+    :type image_field: aiohttp.multipart.BodyPartReader
+
+    :return: None
+    :rtype: None
+    """
+
+    with open(filepath, 'wb') as file:
+        while True:
+            chunk = await image_field.read_chunk()
+
+            if not chunk:
+                break
+
+            file.write(chunk)
+
+
+async def delete_user_image(filepath: pathlib.Path) -> None:
+    """
+    Delete user image.
+
+    :param filepath: absolute path of the image
+    :type filepath: pathlib.Path
+
+    :return: None
+    :rtype: None
+    """
+
+    filepath.unlink(missing_ok=True)

@@ -6,19 +6,23 @@ Contains registration and authorization implementations.
 .. exception:: RegistrationError(UserAccessError)
     Raised when registration data is improper (busy login, incorrect data)
 
-.. function:: _get_user_grant(user_data: dict) -> Type[user_groups.UserGroup]
-    Return user grant that based on user db data
-.. function:: _check_login_for_availability(connection: aiomysql.Connection, login: str) -> bool
+.. function:: _get_user_group_id(user_data: dict) -> int
+    Return user group id by user data
+.. function:: check_login_for_availability(connection: aiomysql.Connection, login: str, *args,
+        except_user_id: Optional[int] = None) -> bool
     Return status of login availability
-.. function:: register_user(connection: aiomysql.Connection, user_form_data: validators.UserCreation) -> None
-    Add user in db (register)
-.. function:: authorize_user(request: aiohttp.web.Request, user_form_data: validators.UserCreation) -> None
-    Set user data in the session
+.. function:: register_user(connection: aiomysql.Connection, user_form_data: validators.UserCreation, *args,
+        user_is_admin: bool = False) -> None
+    Register user (add user in db)
+.. function:: authorize_user(connection: aiomysql.Connection, request: aiohttp.web.Request,
+        user_form_data: Union[validators.UserAuthorization, validators.UserCreation]) -> None
+    Authorize user (set user data in the session)
 .. function:: logout_user(request: aiohttp.web.Request) -> None
-    Clear session user data
+    Logout user (clear the session)
 """
 
 from typing import (
+    Optional,
     Type,
     Union
 )
@@ -28,7 +32,7 @@ import aiohttp_session
 import aiomysql
 
 from . import user_groups
-from .error import UserAccessError
+from .errors import UserAccessError
 from ... import security
 from ...database import (
     db,
@@ -44,7 +48,7 @@ class RegistrationError(UserAccessError):
     """ Raised when registration data is improper (busy login, incorrect data) """
 
 
-def _get_user_group(user_data: dict) -> Type[user_groups.UserGroup]:
+def _get_user_group_id(user_data: dict) -> int:
     """
     Compute user group by user db data.
 
@@ -55,16 +59,23 @@ def _get_user_group(user_data: dict) -> Type[user_groups.UserGroup]:
     :rtype: Type[user_groups.UserGroup]
     """
 
-    user_grant = user_groups.User
+    # nice crutch ...
+
+    # user
+    user_group_id = user_groups.USER_USER_GROUP_ID
     if user_data['is_moderator']:
-        user_grant = user_groups.Moderator
+        # moderator
+        user_group_id = user_groups.MODERATOR_USER_GROUP_ID
     if user_data['is_admin']:
-        user_grant = user_groups.Admin
+        # admin
+        user_group_id = user_groups.ADMIN_USER_GROUP_ID
 
-    return user_grant
+    return user_group_id
 
 
-async def _check_login_for_availability(connection: aiomysql.Connection, login: str) -> bool:
+async def check_login_for_availability(connection: aiomysql.Connection, login: str, *args,
+                                       except_user_id: Optional[int] = None
+                                       ) -> bool:
     """
     Check login for availability.
 
@@ -72,6 +83,8 @@ async def _check_login_for_availability(connection: aiomysql.Connection, login: 
     :type connection: aiomysql.Connection
     :param login: login given in registration form
     :type login: str
+    :keyword except_user_id: if found user will have the same id - function will return True status.
+    :type except_user_id: Optional[int]
 
     :return: status of availability
     :rtype: bool
@@ -80,14 +93,20 @@ async def _check_login_for_availability(connection: aiomysql.Connection, login: 
     status_of_login_availability = False
 
     try:
-        _ = await db.fetch_one_user(connection, login=login)
+        user = await db.fetch_one_user(connection, login=login)
     except db.RecordNotFoundError:
         status_of_login_availability = True
+    else:
+        if except_user_id:
+            user_id = user['id']
+            if user_id == except_user_id:
+                status_of_login_availability = True
 
     return status_of_login_availability
 
 
-async def register_user(connection: aiomysql.Connection, user_form_data: validators.UserCreation) -> None:
+async def register_user(connection: aiomysql.Connection, user_form_data: validators.UserCreation, *args,
+                        user_is_admin: bool = False) -> None:
     """
     Register user_form_data.
 
@@ -95,6 +114,8 @@ async def register_user(connection: aiomysql.Connection, user_form_data: validat
     :type connection: aiomysql.Connection
     :param user_form_data: registration form data
     :type user_form_data: validators.UserCreation
+    :param user_is_admin: with this flag will be registered user with admin grant
+    :type user_is_admin: bool
 
     :return: None
     :rtype: None
@@ -102,13 +123,13 @@ async def register_user(connection: aiomysql.Connection, user_form_data: validat
     :raises RegistrationError: raised if login is busy
     """
 
-    login_availability = await _check_login_for_availability(connection, user_form_data.login)
+    login_availability = await check_login_for_availability(connection, user_form_data.login)
 
     if login_availability:
         hashed_password = security.hash_password(user_form_data.password)
         user_with_hashed_password = validators.UserCreation(login=user_form_data.login, password=hashed_password)
 
-        await db.insert_user(connection, user_with_hashed_password)
+        await db.insert_user(connection, user_with_hashed_password, user_is_admin=user_is_admin)
     else:
         message = 'Login is busy. Choose another, please!'
         raise RegistrationError(message)
@@ -157,8 +178,8 @@ async def authorize_user(connection: aiomysql.Connection, request: aiohttp.web.R
     session['user'] = user_db_data
 
     # set user grant in the session
-    user_grant = _get_user_group(user_db_data)
-    session['user']['group'] = user_grant
+    user_group_id = _get_user_group_id(user_db_data)
+    session['user']['group_id'] = user_group_id
 
 
 async def logout_user(request: aiohttp.web.Request) -> None:
