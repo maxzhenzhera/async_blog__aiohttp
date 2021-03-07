@@ -24,6 +24,10 @@ from loguru import logger
 
 from core.database.models import Database, tables
 from core.settings import BASE_DIR, get_config
+from database_initialization import (
+    generate_data,
+    generate_test_data
+)
 
 
 USER_CONFIG_PATH = BASE_DIR / 'config' / 'config.ini'
@@ -165,6 +169,13 @@ async def main() -> None:
     # # await create_tables(connection)
     # # await drop_user(connection)
     # # await create_user(connection)
+    # --------------------------------------------------
+
+    # --------------------------------------------------
+    # # data generating
+    await generate_data.create_admin_account(connection)
+    # # test data generating
+    await generate_test_data.generate_test_data(connection)
     # --------------------------------------------------
 
     connection.close()
