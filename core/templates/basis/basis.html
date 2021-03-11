@@ -117,7 +117,7 @@
 						<!-- personal user data section -->
 						<ul class="navbar-nav mx-right me-5 pe-5">
 							<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profile</a>
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ session.user.login }}</a>
 								<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 									<li><a class="dropdown-item" href="{{ url('thinker-id', id=session.user.id) }}">My <b>Thinker</b> page</a></li>
 									<li><a class="dropdown-item" href="{{ url('user-settings-edit') }}">Edit settings</a></li>

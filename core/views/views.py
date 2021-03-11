@@ -226,7 +226,7 @@ class PostCreation(aiohttp.web.View):
         return data
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle post creation form """
         data = await self.request.post()
 
@@ -272,7 +272,7 @@ class PostEditing(aiohttp.web.View):
     """ View for '/posts/edit/' url """
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle post editing form """
         data = await self.request.post()
 
@@ -297,7 +297,7 @@ class PostDeleting(aiohttp.web.View):
     """ View for '/posts/delete/' url """
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Delete particular post """
         data = await self.request.post()
 
@@ -342,7 +342,7 @@ class PostRubricCreation(aiohttp.web.View):
         return {}
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ View for '/posts/rubrics/create/' url """
         data = await self.request.post()
 
@@ -385,7 +385,7 @@ class PostRubricEditing(aiohttp.web.View):
     """ View class for '/posts/rubrics/edit/' url"""
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle post rubric editing form """
         data = await self.request.post()
 
@@ -408,7 +408,7 @@ class PostRubricDeleting(aiohttp.web.View):
     """ View for 'posts/rubrics/delete/' url """
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Delete particular post rubric """
         data = await self.request.post()
 
@@ -501,7 +501,7 @@ class NoteCreation(aiohttp.web.View):
         return data
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle note creation form """
         data = await self.request.post()
 
@@ -547,7 +547,7 @@ class NoteEditing(aiohttp.web.View):
     """ View for '/notes/edit/' url """
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle note editing form """
         data = await self.request.post()
 
@@ -572,7 +572,7 @@ class NoteDeleting(aiohttp.web.View):
     """ View for '/notes/delete/' url """
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Delete particular note """
         data = await self.request.post()
 
@@ -620,7 +620,7 @@ class NoteRubricCreation(aiohttp.web.View):
         return {}
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle note rubric creation form """
         data = await self.request.post()
 
@@ -662,7 +662,7 @@ class NoteRubricEditing(aiohttp.web.View):
     """ View for '/notes/rubrics/edit/' url """
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle note rubric editing form """
         data = await self.request.post()
 
@@ -687,7 +687,7 @@ class NoteRubricDeleting(aiohttp.web.View):
     """ View for '/notes/rubrics/delete/' url """
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Delete particular note rubric """
         data = await self.request.post()
 
@@ -718,7 +718,7 @@ class UserRegistration(aiohttp.web.View):
         return {}
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.Visitor)
-    async def post(self) -> Union[aiohttp.web.HTTPSeeOther, aiohttp.web.HTTPFound]:
+    async def post(self) -> Union[aiohttp.web.HTTPFound, aiohttp.web.HTTPSeeOther]:
         """ Handle user registration form """
         data = await self.request.post()
 
@@ -756,7 +756,7 @@ class UserAuthorization(aiohttp.web.View):
         return {}
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.Visitor)
-    async def post(self):
+    async def post(self) -> Union[aiohttp.web.HTTPFound, aiohttp.web.HTTPSeeOther]:
         """ Handle user authorization form """
         data = await self.request.post()
 
@@ -831,7 +831,7 @@ class UserSettingsEditingLogin(aiohttp.web.View):
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     @utils.handle_local_error(except_error=KeyError, raise_error=InvalidFormDataError)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle user login editing form """
         data = await self.request.post()
 
@@ -891,7 +891,7 @@ class UserSettingsEditingPassword(aiohttp.web.View):
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     @utils.handle_local_error(except_error=KeyError, raise_error=InvalidFormDataError)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle user password editing form """
         data = await self.request.post()
 
@@ -936,7 +936,7 @@ class UserSettingsEditingInfo(aiohttp.web.View):
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     @utils.handle_local_error(except_error=KeyError, raise_error=InvalidFormDataError)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle user info settings editing form """
         data = await self.request.post()
 
@@ -989,7 +989,7 @@ class UserSettingsEditingImage(aiohttp.web.View):
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.User)
     @utils.handle_local_error(except_error=AssertionError, raise_error=InvalidFormDataError)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle user image editing form """
         reader = await self.request.multipart()
 
@@ -1126,7 +1126,7 @@ class SettingModeratorByAdmin(aiohttp.web.View):
         return {}
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle setting moderator form """
         data = await self.request.post()
 
@@ -1159,7 +1159,7 @@ class UnsettingModeratorByAdmin(aiohttp.web.View):
         return data
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.Admin)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle unsetting moderator form """
         data = await self.request.post()
 
@@ -1183,12 +1183,12 @@ class PostModerating(aiohttp.web.View):
     @aiohttp_jinja2.template('moderator/post_deleting.html')
     @helpers.put_session_data_in_view_result
     @auth.session.user_group_access_required(user_group=auth.user_groups.Moderator)
-    async def get(self):
+    async def get(self) -> dict:
         """ Return form for post moderating [deleting] """
         return {}
 
     @auth.session.user_group_access_required(user_group=auth.user_groups.Moderator)
-    async def post(self):
+    async def post(self) -> aiohttp.web.HTTPFound:
         """ Handle post moderating form [deleting] """
         data = await self.request.post()
 
