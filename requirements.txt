@@ -6,6 +6,5 @@ bcrypt==3.2.0
 cryptography==3.3.1
 Jinja2==2.11.2
 jinjasql==0.1.8
-loguru==0.5.3
 pydantic==1.7.3
 pipenv==2020.11.15

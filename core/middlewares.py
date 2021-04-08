@@ -11,6 +11,7 @@ Contains middlewares that wrap server work.
     setup all middlewares
 """
 
+import logging
 from typing import (
     Any,
     Callable
@@ -28,6 +29,9 @@ from .views import (
     custom_errors
 )
 from .views.auth import AuthenticationError
+
+
+logger = logging.getLogger(__name__)
 
 
 def create_error_middleware(overrides: dict[int, Callable]) -> Callable:
@@ -83,6 +87,7 @@ def create_error_middleware(overrides: dict[int, Callable]) -> Callable:
         except db.RecordNotFoundError:
             if 404 in overrides:
                 return await overrides[404](request)
+
             raise aiohttp.web.HTTPNotFound
         # - - -
 
@@ -94,6 +99,7 @@ def create_error_middleware(overrides: dict[int, Callable]) -> Callable:
         except AuthenticationError:
             if 403 in overrides:
                 return await overrides[403](request)
+
             raise aiohttp.web.HTTPNotFound
         # - - -
 
@@ -111,8 +117,7 @@ def create_error_middleware(overrides: dict[int, Callable]) -> Callable:
         # - - -
 
         except Exception as error:
-            request.app['logger'].error('Error raised while server is working with message: {}'.format(str(error)))
-            request.app['logger'].exception(error)
+            logger.exception(msg=f'Error raised while server is working: {error}', exc_info=error)
 
             # debug - - |
             # raise
@@ -143,54 +148,6 @@ def create_session_middleware() -> Callable:
     return session_middleware
 
 
-def create_log_middleware() -> Callable:
-    """
-    Create log middleware.
-
-    :return: middleware
-    :rtype: Callable
-    """
-
-    @aiohttp.web.middleware
-    async def log_middleware(request: aiohttp.web.Request, handler: Callable) -> Any:
-        """
-
-        :param request: request
-        :type request:
-        :param handler: view function
-        :type handler: Callable
-
-        :return: handler result
-        :rtype: Any
-
-        :raises aiohttp.web.HTTPException: raised if any http error was caught (while view function produce result)
-        """
-
-        message = "TRAFFIC LOG:\n"
-        message += ('=' * 124) + '\n'
-        message += f"{'FROM':^30}|{'TO':^70}|{'WITH':^10}|{'CODE':^10}|\n"
-        message += ('=' * 124) + '\n'
-        message += "{:^30}|{:^70}|{:^10}|{:^10}|\n"
-        message += ('=' * 124) + '\n'
-
-        try:
-            handler_result = await handler(request)
-        except aiohttp.web.HTTPException as error:
-            message = message.format(request.remote, str(request.url), request.method, error.status)
-            request.app['logger'].info(message)
-
-            raise error
-        else:
-            # pass static downloads
-            if 'static' not in str(request.url):
-                message = message.format(request.remote, str(request.url), request.method, 200)
-                request.app['logger'].info(message)
-
-            return handler_result
-
-    return log_middleware
-
-
 def setup_middlewares(app: aiohttp.web.Application) -> None:
     """
     Setup all middlewares.
@@ -204,12 +161,10 @@ def setup_middlewares(app: aiohttp.web.Application) -> None:
 
     error_middleware = create_error_middleware(overrides=custom_errors.errors)
     session_middleware = create_session_middleware()
-    log_middleware = create_log_middleware()
 
     middlewares = [
         error_middleware,
         session_middleware,
-        log_middleware
     ]
 
     app.middlewares.extend(middlewares)

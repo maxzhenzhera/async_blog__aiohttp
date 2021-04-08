@@ -7,19 +7,17 @@ Initializes app.
     run app
 """
 
+import logging
+
 import aiohttp
 import aiohttp.web
 import aiohttp_jinja2
 import jinja2
-from loguru import logger
 
 from .database.mysql import init_mysql, close_mysql
 from .middlewares import setup_middlewares
 from .routes import setup_routes
-from .settings import (
-    get_config,
-    ERROR_LOG
-)
+from .settings import get_config
 
 
 async def init_app() -> aiohttp.web.Application:
@@ -36,8 +34,7 @@ async def init_app() -> aiohttp.web.Application:
     app['config'] = get_config()
 
     # set logger
-    logger.add(ERROR_LOG, level='ERROR')
-    app['logger'] = logger
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
     # setup Jinja2 template renderer
     aiohttp_jinja2.setup(
