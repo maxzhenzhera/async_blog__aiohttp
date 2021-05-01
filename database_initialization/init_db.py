@@ -1,154 +1,126 @@
 """
 Setups, drops database (database, user, tables).
 
-.. function:: setup_db(connection: aiomysql.Connection) -> None
-    setup the full database with tables and user, database ready to work
-.. function:: teardown_db(connection: aiomysql.Connection) -> None
-    drop the full database with tables and user, database entirely deleted
-.. function:: create_tables(connection: aiomysql.Connection) -> None
-    create all tables for the database
-.. function:: drop_tables(connection: aiomysql.Connection) -> None
-    drop all tables from the database
-.. function:: create_user(connection: aiomysql.Connection) -> None
-    create the database user
-.. function::f drop_user(connection: aiomysql.Connection) -> None
-    drop the database user
-.. function:: main() -> None
-    use all the above functions
+.. async:: create_tables(connection: aiomysql.Connection) -> None
+.. async:: drop_tables(connection: aiomysql.Connection) -> None
+.. func:: dump_sql_of_tables_creation()
+.. async:: main() -> None
 """
 
+import pathlib
+import sys
+
+
+# add package to global path -------------------------------------------------------------------------------------------
+sys.path.append(pathlib.Path(__file__).parent.parent.__str__())
+# ----------------------------------------------------------------------------------------------------------------------
+
+
 import asyncio
+import datetime
+import logging
 
 import aiomysql
-from loguru import logger
 
-from core.database.models import Database, tables
-from core.settings import BASE_DIR, get_config
-from database_initialization import (
-    generate_data,
-    generate_test_data
+from core.database import models
+from core.security import hash_password
+from core.settings import (
+    DB_HOST,
+    DB_PORT,
+    DB_USER,
+    DB_PASSWORD,
+    DB_NAME,
+    WEBSITE_ADMIN_LOGIN,
+    WEBSITE_ADMIN_PASSWORD
 )
 
 
-USER_CONFIG_PATH = BASE_DIR / 'config' / 'config.ini'
-USER_CONFIG = get_config()
-DATABASE_CONFIG = USER_CONFIG['mysql']
-
-DB_NAME: str = DATABASE_CONFIG['database']
-DB_HOST: str = DATABASE_CONFIG['host']
-DB_PORT: int = int(DATABASE_CONFIG['port'])
-DB_USER_NAME: str = DATABASE_CONFIG['user_name']
-DB_USER_PASSWORD: str = DATABASE_CONFIG['user_password']
-
-# data for first set up (used `root` user for creating database and user)
-DB_ROOT_NAME: str = DATABASE_CONFIG['root_name']
-DB_ROOT_PASSWORD: str = DATABASE_CONFIG['root_password']
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-async def setup_db(connection: aiomysql.Connection) -> None:
-    """ Create database, tables and user """
-    query_to_create_database = Database.create_database
-    params = {
-        'db_name': DB_NAME
-    }
-
-    query = query_to_create_database.format(**params)
-
-    async with connection.cursor() as cursor:
-        await cursor.execute(query)
-
-    logger.success('Database is created.')
-
-    await create_tables(connection)
-    await create_user(connection)
-
-
-async def teardown_db(connection: aiomysql.Connection) -> None:
-    """ Drop the entire base """
-    query_to_drop_database = Database.drop_database
-    params = {
-        'db_name': DB_NAME
-    }
-
-    query = query_to_drop_database.format(**params)
-
-    async with connection.cursor() as cursor:
-        await cursor.execute(query)
-
-    logger.success('Database is dropped.')
-
-    await drop_user(connection)
+SQL_DUMP_DIR = pathlib.Path(__file__).parent / 'sql'
+SQL_DUMP_DIR.mkdir(parents=True, exist_ok=True)
+SQL_TABLES_DUMP_FILEPATH = SQL_DUMP_DIR / '!init_tables.sql'
+SQL_ADMIN_ACCOUNT_DUMP_FILEPATH = SQL_DUMP_DIR / 'init_admin_account.sql'
 
 
 async def create_tables(connection: aiomysql.Connection) -> None:
     """ Create all tables in the database """
-    query_to_use_database = Database.use_database
-    params = {
-        'db_name': DB_NAME
-    }
-
-    query_to_use_database = query_to_use_database.format(**params)
+    stmt = '\n'.join([table.create_table for table in models.tables])
 
     async with connection.cursor() as cursor:
-        await cursor.execute(query_to_use_database)
+        await cursor.execute(stmt)
 
-        for table in tables:
-            query_to_create_table = table.create_table
-            await cursor.execute(query_to_create_table)
-
-    logger.success('Tables are created.')
+    logger.info('Tables have been created!')
 
 
 async def drop_tables(connection: aiomysql.Connection) -> None:
     """ Drop all tables in the database """
-    query_to_use_database = Database.use_database
-    params = {
-        'db_name': DB_NAME
-    }
-
-    query_to_use_database = query_to_use_database.format(**params)
+    stmt = '\n'.join(reversed([table.drop_table for table in models.tables]))
 
     async with connection.cursor() as cursor:
-        await cursor.execute(query_to_use_database)
+        await cursor.execute(stmt)
 
-        for table in tables:
-            query_to_drop_table = table.drop_table
-            await cursor.execute(query_to_drop_table)
-
-    logger.success('Tables are dropped.')
+    logger.info('Tables have been dropped!')
 
 
-async def create_user(connection: aiomysql.Connection) -> None:
-    """ Create user that lead the app database """
-    query_to_create_user = Database.create_user
+async def create_website_admin(connection: aiomysql.Connection) -> None:
+    """ Create admin account """
+    stmt = " INSERT INTO `users` (`login`, `password`, `is_admin`) VALUES (%(login)s, %(password)s, %(is_admin)s) "
     params = {
-        'db_name': DB_NAME,
-        'host': DB_HOST,
-        'user_name': DB_USER_NAME,
-        'user_password': DB_USER_PASSWORD
+        'login': WEBSITE_ADMIN_LOGIN,
+        'password': hash_password(WEBSITE_ADMIN_PASSWORD),
+        'is_admin': True
+    }
+    cursor: aiomysql.Cursor
+    async with connection.cursor() as cursor:
+        await cursor.execute(stmt, params)
+
+    logger.info('Admin account have been created!')
+
+
+def dump_sql_of_tables_creation() -> None:
+    """ Dump sql code of tables creation """
+    sql_dump = '\n'.join([table.create_table for table in models.tables])
+    dump_comment = (
+        '/*'
+        f'\n\tModels version: {models.__version__}'
+        f'\n\tGeneration time: {datetime.datetime.now().isoformat()}'
+        '\n*/\n'
+    )
+
+    with open(SQL_TABLES_DUMP_FILEPATH, 'w') as file:
+        file.write(dump_comment)
+        file.write(sql_dump)
+
+    logger.info(f'Sql dump of tables creation is ready! To see - check: {SQL_TABLES_DUMP_FILEPATH}')
+
+
+async def dump_sql_of_admin_account_creation(connection: aiomysql.Connection) -> None:
+    """ Dump sql code of tables creation """
+    stmt = " INSERT INTO `users` (`login`, `password`, `is_admin`) VALUES (%(login)s, %(password)s, %(is_admin)s); "
+    params = {
+        'login': WEBSITE_ADMIN_LOGIN,
+        'password': hash_password(WEBSITE_ADMIN_PASSWORD),
+        'is_admin': True
     }
 
-    query = query_to_create_user.format(**params)
-
     async with connection.cursor() as cursor:
-        await cursor.execute(query)
+        query = stmt % cursor._escape_args(params, connection)
 
-    logger.success('User is created.')
+    sql_dump = query
+    dump_comment = (
+        '/*'
+        f'\n\tGeneration time: {datetime.datetime.now().isoformat()}'
+        '\n*/\n'
+    )
 
+    with open(SQL_ADMIN_ACCOUNT_DUMP_FILEPATH, 'w') as file:
+        file.write(dump_comment)
+        file.write(sql_dump)
 
-async def drop_user(connection: aiomysql.Connection) -> None:
-    """ Drop user that lead the app database """
-    query_to_drop_user = Database.drop_user
-    params = {
-        'user_name': DB_USER_NAME
-    }
-
-    query = query_to_drop_user.format(**params)
-
-    async with connection.cursor() as cursor:
-        await cursor.execute(query, params)
-
-    logger.success('User is dropped.')
+    logger.info(f'Sql dump of website admin account is ready! To see - check: {SQL_ADMIN_ACCOUNT_DUMP_FILEPATH}')
 
 
 async def main() -> None:
@@ -156,27 +128,18 @@ async def main() -> None:
     connection = await aiomysql.connect(
         host=DB_HOST,
         port=DB_PORT,
-        user=DB_ROOT_NAME,
-        password=DB_ROOT_PASSWORD,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        db=DB_NAME,
         autocommit=True
     )
 
-    await teardown_db(connection)
-    await setup_db(connection)
+    await drop_tables(connection)
+    await create_tables(connection)
+    await create_website_admin(connection)
 
-    # --------------------------------------------------
-    # # await drop_tables(connection)
-    # # await create_tables(connection)
-    # # await drop_user(connection)
-    # # await create_user(connection)
-    # --------------------------------------------------
-
-    # --------------------------------------------------
-    # # data generating
-    await generate_data.create_admin_account(connection)
-    # # test data generating
-    await generate_test_data.generate_test_data(connection)
-    # --------------------------------------------------
+    await dump_sql_of_admin_account_creation(connection)
+    dump_sql_of_tables_creation()
 
     connection.close()
 
