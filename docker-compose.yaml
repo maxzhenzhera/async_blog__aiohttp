@@ -1,0 +1,44 @@
+version: "3.9"
+
+
+services:
+
+  mysql:
+    image: mysql
+    volumes:
+      # initialize db (tables creating)
+      - ./database_initialization/sql:/docker-entrypoint-initdb.d
+      # volume for persist data saving
+      - db_volume:/var/lib/mysql
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_USER=$DB_USER
+      - MYSQL_PASSWORD=$DB_PASSWORD
+      - MYSQL_DATABASE=$DB_NAME
+    command: --port $DB_PORT
+
+  web:
+    # image: maxzhenzhera/async_blog__aiohttp
+    build: .
+    # to embed prepared .env
+    env_file:
+      - .env
+    # to override some connections vars (db - powered by docker)
+    environment:
+      DB_HOST: mysql
+      # for correct work [port exposing] in docker container
+      SERVER_HOST: 0.0.0.0
+    ports:
+      - 5000:$SERVER_PORT
+    depends_on:
+      - mysql
+    # on first startup db takes time for initializing
+    # any healthcheck is not used for this
+    # so, to ensure final start of the web service
+    # -> restart service always
+    # (obviously, on first time it`ll be errors about db connecting)
+    restart: always
+
+
+volumes:
+  db_volume:
