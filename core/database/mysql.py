@@ -7,8 +7,21 @@ Contains functions that manage MySql connection (actions on start and on shut).
     Close database connection
 """
 
+import logging
+
 import aiohttp.web
 import aiomysql
+
+from ..settings import (
+    DB_NAME,
+    DB_HOST,
+    DB_PORT,
+    DB_USER,
+    DB_PASSWORD
+)
+
+
+logger = logging.getLogger(__name__)
 
 
 async def init_mysql(app: aiohttp.web.Application) -> None:
@@ -22,18 +35,18 @@ async def init_mysql(app: aiohttp.web.Application) -> None:
     :rtype: None
     """
 
-    db_config = app['config']['mysql']
-
     pool: aiomysql.Pool = await aiomysql.create_pool(
-        host=db_config['host'],
-        port=int(db_config['port']),
-        user=db_config['user_name'],
-        password=db_config['user_password'],
-        db=db_config['database'],
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        db=DB_NAME,
         autocommit=True
     )
 
     app['db'] = pool
+
+    logger.info('Db pool has been set!')
 
 
 async def close_mysql(app: aiohttp.web.Application) -> None:
