@@ -17,7 +17,10 @@ import jinja2
 from .database.mysql import init_mysql, close_mysql
 from .middlewares import setup_middlewares
 from .routes import setup_routes
-from .settings import get_config
+from .settings import (
+    SERVER_HOST,
+    SERVER_PORT
+)
 
 
 async def init_app() -> aiohttp.web.Application:
@@ -29,9 +32,6 @@ async def init_app() -> aiohttp.web.Application:
     """
 
     app = aiohttp.web.Application()
-
-    # set app config
-    app['config'] = get_config()
 
     # set logger
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -65,9 +65,8 @@ def main() -> None:
 
     app = init_app()
 
-    config = get_config()
     aiohttp.web.run_app(
         app,
-        host=config["server"]['host'],
-        port=int(config["server"]['port'])
+        host=SERVER_HOST,
+        port=SERVER_PORT
     )
