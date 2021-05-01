@@ -8,3 +8,4 @@ Jinja2==2.11.2
 jinjasql==0.1.8
 pydantic==1.7.3
 pipenv==2020.11.15
+python-dotenv==0.17.1
