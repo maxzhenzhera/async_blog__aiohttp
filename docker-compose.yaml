@@ -18,7 +18,7 @@ services:
     command: --port $DB_PORT
 
   web:
-    # image: maxzhenzhera/async_blog__aiohttp
+    # image: maxzhenzhera/async_blog_aiohttp
     build: .
     # to embed prepared .env
     env_file:
