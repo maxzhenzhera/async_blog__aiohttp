@@ -17,6 +17,10 @@ services:
       - MYSQL_DATABASE=$DB_NAME
     command: --port $DB_PORT
 
+  redis:
+    image: redis
+    command: --port $REDIS_PORT
+
   web:
     # image: maxzhenzhera/async_blog_aiohttp
     build: .
@@ -26,12 +30,14 @@ services:
     # to override some connections vars (db - powered by docker)
     environment:
       DB_HOST: mysql
+      REDIS_HOST: redis
       # for correct work [port exposing] in docker container
       SERVER_HOST: 0.0.0.0
     ports:
       - 5000:$SERVER_PORT
     depends_on:
       - mysql
+      - redis
     # on first startup db takes time for initializing
     # any healthcheck is not used for this
     # so, to ensure final start of the web service

@@ -11,11 +11,15 @@ import logging
 
 import aiohttp
 import aiohttp.web
+import aiohttp_session
 import aiohttp_jinja2
 import jinja2
 
 from .database.mysql import init_mysql, close_mysql
-from .middlewares import setup_middlewares
+from .middlewares import (
+    create_session_redis_storage,
+    setup_middlewares
+)
 from .routes import setup_routes
 from .settings import (
     SERVER_HOST,
@@ -50,6 +54,9 @@ async def init_app() -> aiohttp.web.Application:
     setup_routes(app)
 
     # setup middlewares
+    session_redis_storage = await create_session_redis_storage()
+    aiohttp_session.setup(app, session_redis_storage)
+
     setup_middlewares(app)
 
     return app

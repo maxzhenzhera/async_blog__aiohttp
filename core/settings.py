@@ -16,6 +16,9 @@ Contains settings data (paths, config).
 .. data:: DB_HOST
 .. data:: DB_PORT
 
+.. data:: REDIS_HOST
+.. data:: REDIS_PORT
+
 .. data:: WEBSITE_ADMIN_LOGIN
 .. data:: WEBSITE_ADMIN_PASSWORD
 
@@ -40,14 +43,19 @@ IMAGES_DIR = STATIC_DIR / 'images'
 USER_IMAGES_DIR = IMAGES_DIR / 'user_images'
 
 
+DEFAULT_SERVER_PORT = 5000
 SERVER_HOST = os.getenv('SERVER_HOST')
-SERVER_PORT = int(os.getenv('SERVER_PORT'))
+SERVER_PORT = int(os.getenv('SERVER_PORT')) if os.getenv('SERVER_PORT') else DEFAULT_SERVER_PORT
 
 DB_NAME = os.getenv('DB_NAME')
 DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
-DB_PORT = int(os.getenv('DB_PORT'))
+DB_PORT = int(os.getenv('DB_PORT')) if os.getenv('DB_PORT') else None
+
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = int(os.getenv('REDIS_PORT')) if os.getenv('REDIS_PORT') else None
+REDIS_ADDRESS = (REDIS_HOST, REDIS_PORT)
 
 
 WEBSITE_ADMIN_LOGIN = os.getenv('WEBSITE_ADMIN_LOGIN')

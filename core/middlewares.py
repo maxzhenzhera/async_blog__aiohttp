@@ -3,8 +3,8 @@ Contains middlewares that wrap server work.
 
 .. function:: create_error_middleware(overrides) -> Callable
     create error middleware
-.. function:: create_session_middleware() -> Callable
-    create session middleware
+.. function:: create_session_redis_storage() -> RedisStorage
+    create session redis storage
 .. function:: create_log_middleware() -> Callable
     create log middleware
 .. function:: setup_middlewares(app: aiohttp.web.Application) -> None
@@ -18,11 +18,11 @@ from typing import (
 )
 
 import aiohttp.web
-import aiohttp_session
-import aiohttp_session.cookie_storage
+from aiohttp_session.redis_storage import RedisStorage
+import aioredis
 import pymysql
 
-from . import security
+from .settings import REDIS_ADDRESS
 from .database import db
 from .views import (
     InvalidFormDataError,
@@ -132,20 +132,24 @@ def create_error_middleware(overrides: dict[int, Callable]) -> Callable:
     return error_middleware
 
 
-def create_session_middleware() -> Callable:
+async def create_session_redis_storage() -> RedisStorage:
     """
-    Create session middleware.
+    Create session redis storage.
+
+    For redis pool creation `await` - async function is required.
+    Middleware setup moved in async `init_app` function.
 
     :return: middleware
     :rtype: Callable
     """
 
-    secret_key = security.generate_secret_key()
-    cookie_storage = aiohttp_session.cookie_storage.EncryptedCookieStorage(secret_key)
+    redis_pool = await aioredis.create_redis_pool(REDIS_ADDRESS)
 
-    session_middleware = aiohttp_session.session_middleware(cookie_storage)
+    logger.info('Redis session storage has been set!')
 
-    return session_middleware
+    session_redis_storage = RedisStorage(redis_pool)
+
+    return session_redis_storage
 
 
 def setup_middlewares(app: aiohttp.web.Application) -> None:
@@ -160,11 +164,9 @@ def setup_middlewares(app: aiohttp.web.Application) -> None:
     """
 
     error_middleware = create_error_middleware(overrides=custom_errors.errors)
-    session_middleware = create_session_middleware()
 
     middlewares = [
         error_middleware,
-        session_middleware,
     ]
 
     app.middlewares.extend(middlewares)

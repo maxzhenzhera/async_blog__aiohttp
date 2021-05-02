@@ -15,6 +15,7 @@ pydantic = "==1.7.3"
 pipenv = "==2020.11.15"
 Jinja2 = "==2.11.2"
 python-dotenv = "*"
+aioredis = "*"
 
 [dev-packages]
 
